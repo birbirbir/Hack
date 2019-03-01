@@ -784,12 +784,20 @@ It can be used for adding encryption to legacy applications, going through firew
 If you do not have public IP or your IP is blocked on some site you can use proxy forwarding.
 In the such situation you must ensure that another machine (or localhost) has ssh configured.
 This machine can be any computer connected to the internet.
+In order to configure ssh on your machine(s) (assuming you are using OpenSSH server) you must open \q{/etc/ssh/sshd\_config} and set \q{AllowTcpForwarding=Yes}.
+Additionally if you are using remote port forwarding you must set \q{GatewayPorts=Yes}.
+After that restart ssh client by: \q{sudo service sshd restart}.
 The easier way to show idea of using such proxy is to have machine connected to the same hub/router.
 
 %todo finish that
 \subsubsection{Local port forwarding}
-Local forwarding is used to forward a port from the client machine to the server machine.
-\texttt{ssh -L <port\_to\_forward\_to>:<host\_to\_forward\_to>:<port\_from\_remote\_host> <login>@<remote\_host>} \newline\newline
+Local port forwarding allows you to forward traffic on a port of your local computer to the SSH server, which is forwarded to a destination server.
+In other words connection via ssh is redirected by your machine to the another server.
+
+
+\texttt{ssh -L <local\_port\_to\_forward\_from>:<host\_to\_forward\_to>:<destination\_port\_from\_remote\_host> <login>@<local\_host>} \newline\newline
+
+Now if you send a request (or point the address into browser) to \q{http://localhost:<local\_port\_to\_forward\_from>} you will be redirested to \q{<host\_to\_forward\_to>}
 
 
 
