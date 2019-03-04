@@ -210,7 +210,10 @@ Usually this scan shows different ports than other scans and it takes more time 
 
 
 \subsubsection{\texttt{NetCat: nc <options> hostname port(s)}}
+Netcat, usually abbreviated to nc, is a network utility with which you can use TCP/IP protocols to read and write data across network connections.
+You can use it to create any kind of connection as well as to explore and debug networks using tunneling mode, port-scanning, etc.
 Checks whether given ports are listening.
+
 \texttt{-v} - Verbose, use twice (-vv) to get more info, e.g: \texttt{nc -v 127.0.0.1  8080}
 
 \subsubsection{\texttt{nslookup}}
@@ -299,7 +302,7 @@ Use is as regular websploit module.
 
 \subsubsection{spider}
 Spider is a module of burp suite that scans the application.
-See more in\ref{subsec:burp}
+See more in \ref{subsec:burp}
 
 
 
@@ -358,6 +361,56 @@ Scanner module is vulnerability scanner and is present only in professional (non
 
 \subsubsection{Intruder module}
 
+%todo add reference to hydra
+In some cases you might want to use repeater for request multiplication.
+Considering you have input field in the application and the does not count number of requests made on it.
+In other words if you can call the endpoint multiple times without blocking the IP address you can use intruder mode.
+There are also other tools helping to conduct such scenario, for more info see brute force attacks in \ref{subsec:bruteforce}.\newline \newline
+In order to use intruder you must (like always) right click on the request from request list and send it to intruder.
+You can (like in repeater) add each request into new fresh tab which makes your work clean.
+Usually intruder module will preselect body variables to help you, but you can choose your own positions.
+There are four tabs in intruder mode: target, positions,payload and options.
+In target tab you configure the target host and ports.
+In positions tab there are preselected positions of request variables within the body.
+If you do not accept preselection you can use buttons and add, clear, or set auto selection.
+Also there are four attack types to select from the list: Sniper, Battering ram, Pitchfork, Cluster bomb.
+
+\paragraph{Sniper}
+This uses a single set of payloads.
+It targets each payload position in turn, and places each payload into that position in turn.
+Positions that are not targeted for a given request are not affected - the position markers are removed and any enclosed text that appears between them in the template remains unchanged.
+This attack type is useful for fuzzing a number of request parameters individually for common vulnerabilities.
+The total number of requests generated in the attack is the product of the number of positions and the number of payloads in the payload set.
+In other words if we have 5 inputs and 10 payload elements intruder will run 50 times.
+\paragraph{Battering ram}
+This uses a single set of payloads.
+It iterates through the payloads, and places the same payload into all of the defined payload positions at once.
+This attack type is useful where an attack requires the same input to be inserted in multiple places within the request (e.g. a username within a Cookie and a body parameter).
+The total number of requests generated in the attack is the number of payloads in the payload set.
+In other words if we have 5 inputs and 10 payload elements intruder will run 10 times.
+\paragraph{Pitchfork}
+This uses multiple payload sets.
+There is a different payload set for each defined position (up to a maximum of 20).
+The attack iterates through all payload sets simultaneously, and places one payload into each defined position.
+In other words, the first request will place the first payload from payload set 1 into position 1 and the first payload from payload set 2 into position 2;
+the second request will place the second payload from payload set 1 into position 1 and the second payload from payload set 2 into position 2, etc.
+This attack type is useful where an attack requires different but related input to be inserted in multiple places within the request (e.g. a username in one parameter, and a known ID number corresponding to that username in another parameter).
+The total number of requests generated in the attack is the number of payloads in the smallest payload set
+In oder words if you have 5 inputs you choose and 5  payload elements intruder will run one time, if you have 5 inputs and 10 payload elements it will run 2 times etc.
+\paragraph{Cluster bomb}
+This uses multiple payload sets.
+There is a different payload set for each defined position (up to a maximum of 20).
+The attack iterates through each payload set in turn, so that all permutations of payload combinations are tested.
+If there are two payload positions, the attack will place the first payload from payload set 2 into position 2, and iterate through all the payloads in payload set 1 in position 1;
+it will then place the second payload from payload set 2 into position 2, and iterate through all the payloads in payload set 1 in position 1.
+In other words this module will run all possible permutations of payloads and inputs.
+This attack type is useful where an attack requires different and unrelated or unknown input to be inserted in multiple places within the request (e.g. when guessing credentials, a username in one parameter, and a password in another parameter).
+The total number of requests generated in the attack is the product of the number of payloads in all defined payload sets - this may be extremely large.
+\newline
+Once you have chosen the attack type you will see different payload options in payload tab.
+You can also configure them here.
+You can provide your own word list by copying it and pasting in PayloadOptions after choosing PayloadType to Simple list.
+Afterwards just go to "Intruder" tab in the main menu bar and start attack
 
 \subsubsection{Repeater module}
 
@@ -414,14 +467,45 @@ You will be overloaded by amount of data in capturing window.
 In order to sort it in some usefull way special filters can be used.
 You can type basically \texttt{http} or \texttt{ssl} in filter pane and confirm it (you might need to restart capturing).
 Afterwards you will see only http or tls protocols data in capturing window.
+You can obviously set up other filters if needed, they can be related to variety of protocols.
 You can click on one line and in window below you will see data from the given protocol as well as from protocols included in the request.
 In order to customize filters click on "Expression..." which is located by the filter pane.
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%    ATTACKS     %%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\section{Attacks}
 
+In this section few types of attacks and related to them tools are described.
+
+\subsection{Brute force attack}
+\label{subsec:bruteforce}
+This attack relates to forcing the target.
+In this scenario you want to send thousands of requests on one endpoint or set of endpoints.
+In such case you think that after such stack of tries you will find the solution.
+There are many ways and tools to help you in this attack and they are mentioned below.
+
+\subsubsection{Hydra}
+\label{subsubsec:hydra}
+Hydra is a parallelized login cracker which supports numerous protocols to attack.
+It is very fast and flexible, and new modules are easy to add.
+This tool makes it possible for researchers and security consultants to show how easy it would be to gain unauthorized access to a system remotely.
+
+The basic syntax is: \texttt{hydra -L <path\_to\_login\_wordlist> -P <path\_to\_pass\_wordlist> <target\_ip> }
+
+You can also use it for endpoints that does not need pass and login, it can be used for any kind of input.
+
+\subsubsection{Curl}
+Curl is mentioned here but it is not attack-focused tool.
+It is mentioned here since it allows you send multiple requests in looped way by scripting in bash.
+In order to sent POST request on \texttt{/registration} endpoint you should send the following request multiple times:\newline \newline
+\texttt{curl -d "param1=value1\&param2=value2" -X POST http://<remote\_or\_local\_host>:3000/data} \newline
+where param1 and param 2 can be login and password.
+For more detailed info about scripting in curl see\ref{subsubsec:curl}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%    METASPLOIT     %%%%%%%%%%%%%%%
@@ -827,6 +911,9 @@ Now if you send a request (or point the address into browser) to \q{http://local
 
 \subsection{Regexp, grep and regular expressions}
 \subsection{Bash scripts}
+\subsubsection{Curl}
+\label{subsubsec:curl}
+
 \subsection{Buffer Overflow}
 
 
@@ -926,7 +1013,7 @@ How to Break Web Software; M.Andrews, J.A. Whittaker, Addison Wesley 2009.
 \bibitem{pen}
 Penetration Testing, Hands-on Introduction to Hacking , G. Weidman, No Starch Press 2014
 \bibitem{baut}
-\href{https://www.youtube.com/watch?v=04c0JiE8YNQ}{Szkolenie Z Testowania Bezpieczeństwa Aplikacji Webowych - Pełen OWASP TOP 10 by Dawid Bałut}
+\href{https://www.youtube.com/watch?v=04c0JiE8YNQ}{Szkolenie Z Testowania Bezpieczenstwa Aplikacji Webowych - Pelen OWASP TOP 10 by Dawid Balut}
 \bibitem{osi}
 \href{https://www.webopedia.com/quick_ref/OSI_Layers.asp}{OSI\_Layers}
 
