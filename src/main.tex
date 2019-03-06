@@ -410,7 +410,14 @@ The total number of requests generated in the attack is the product of the numbe
 Once you have chosen the attack type you will see different payload options in payload tab.
 You can also configure them here.
 You can provide your own word list by copying it and pasting in PayloadOptions after choosing PayloadType to Simple list.
-Afterwards just go to "Intruder" tab in the main menu bar and start attack
+Afterwards just go to "Intruder" tab in the main menu bar and start attack.
+After your attack is finished you can compare chosen responses in comparer (see \ref{subsubsec:comparer}).
+
+\subsubsection{Comparer}
+\label{subsubsec:comparer}
+It compares selected requests or responses.
+Basically click on few (at least two) requests and send it (or their responses) to comparer.
+Inside comparer you can compare then from byte or word point of view.
 
 \subsubsection{Repeater module}
 
@@ -871,7 +878,6 @@ This machine can be any computer connected to the internet.
 In order to configure ssh on your machine(s) (assuming you are using OpenSSH server) you must open \q{/etc/ssh/sshd\_config} and set \q{AllowTcpForwarding=Yes}.
 Additionally if you are using remote port forwarding you must set \q{GatewayPorts=Yes}.
 After that restart ssh client by: \q{sudo service sshd restart}.
-The easier way to show idea of using such proxy is to have machine connected to the same hub/router.
 
 %todo finish that
 \subsubsection{Local port forwarding}
@@ -879,12 +885,45 @@ Local port forwarding allows you to forward traffic on a port of your local comp
 In other words connection via ssh is redirected by your machine to the another server.
 
 
-\texttt{ssh -L <local\_port\_to\_forward\_from>:<host\_to\_forward\_to>:<destination\_port\_from\_remote\_host> <login>@<local\_host>} \newline\newline
+\texttt{ssh -L <local\_port\_to\_forward\_from>:<remote\_host\_A>:<destination\_port\_from\_remote\_host> <login>@<local\_host>} \newline\newline
+Here ssh establishes connection and listens on \q{local\_port\_to\_forward\_from} and redirects the traffic to \q{destination\_port\_from\_remote\_host}.
+Now if you send a request (or point the address into browser) to \q{http://localhost:<local\_port\_to\_forward\_from>} you will be redirected to \q{<host\_to\_forward\_to>}
 
-Now if you send a request (or point the address into browser) to \q{http://localhost:<local\_port\_to\_forward\_from>} you will be redirested to \q{<host\_to\_forward\_to>}
+\paragraph{Example} Forwarding local port to \q{http://internet.com:80}. \newline \newline
+\texttt{ssh -L 9001:www.internet.com:80 localhost} \newline \newline
+Here you can instead of "localhost" type your local ip address od name of your computer.
+Now if you go to browser and type \q{localhost:9001} you will be redirected to \q{www.internet.com:80}.
+Notice that traffic goes only through your own network card.
+\newline
+\newline
+Let's have a look at another scenario.
+For instance if you have your own computer A and "mistification" user on  computer B (\q{10.10.10.1}) somewhere (or virtual machine) that is trusted to some other server C (\q{123.456.789.000}) you can forward traffic from ports A to B and to remote server C in order to redirect it to back to B and A again.
+Look at the example: \newline \newline
+\texttt{ssh -L 9004:123.456.789.000:80 mistification@10.10.10.1} \newline \newline
+This will establish connection between your machine and \q{10.10.10.1} and will forward the traffic coming from your machine from 9004 port to ssh server on \q{10.10.10.1}.
+Now you established ssh tunnel between your machine, remote machine and server.
+If you type in your browser \q{localhost:9004} you will be redirected to \q{123.456.789.000:80} (it can be any site instead of IP like www.internet.com or else).
+But now traffic goes also through \q{10.10.10.1} network card.
+You can easily check it by running wireshark (see \ref{subsec:wireshark}) on \q{10.10.10.1} and filtering by "ssh".
+Now you must call the \q{localhost:9004} and you will see packets going through \q{10.10.10.1} network interface.
+Always if you have exchange key saved for \q{10.10.10.1} you can use ssh forwarding it as:\newline \newline
+
+\q{ssh -i <path\_to\_key> -L 9004:123.456.789.000:80 10.10.10.1}
+
+\subsubsection{Remote port forwarding}
+
+Remote port forwarding it the opposite thing to local in terms of traffic forwarding.
+When you set up the connection and remote host calls some site or ip address the traffic goes through your destination server and port.
+Look at the syntax example: \newline\newline
 
 
+\q{ssh -R 9004:127.0.0.1:8001 admin@mistificated.global}\newline\newline
 
+In this case ssh establishes connection between your machine and binds to port \q{9004} on \q{mistificated.global}.
+Now if someone calls the \q{https://mistificated.global:9004} (and it does not matter whe the calling machine is from) it will see traffic that is to be send on \q{127.0.0.1:80 on your machine}.
+So if you have an application working on \q{localhost:8080/WebGoat} (for instance WebGoat jsp app deployed locally on tomcat) and you will set up ssh port forwarding by: \newline
+\q{ssh -R 9004:localhost:8080 admin@mistificated.global} \newline
+and if user hits \q{https://mistificated.blobal:9004} in his browser, user will se the WebGoat.jsp application.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
