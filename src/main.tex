@@ -300,11 +300,22 @@ It is actually powerful metasploit module and it is called: \texttt{auxilary/cra
 
 This is a substitute for metasploit for web applications and its usage is very similar.
 One websploit module works similarly to wmap and it is called: \texttt{web/dir search}.
-Use is as regular websploit module.
+Usage is as regular websploit module.
+
 
 \subsubsection{spider}
 Spider is a module of burp suite that scans the application.
 See more in \ref{subsec:burp}
+
+\subsubsection{gobuster}
+Gobuster is a tool used to brute-force on URLs (directories and files) in websites and DNS subdomains.
+Gobuster can be downloaded through the apt- repository.
+Example syntax is: \newline
+\q{gobuster -u http://192.168.1.108/pages -w /usr/share/wordlists/dirb/common.txt}
+
+
+
+
 
 
 
@@ -815,6 +826,7 @@ Finally you should see remote terminal and execute commands remotely.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{PHP script injection}
+\label{subsec:phpinjection}
 Some websites allows users to upload content other than text e.g photos, movies, games and many other odd file formats.
 While it is not properly controlles what type is being saved user is able to embeed PHP code which will be executed every time while trying to "see" uploaded content.
 The vulnerability here is the remote shell execution.
@@ -823,7 +835,7 @@ In order to run the script you should find possibility to embeed the following s
 In this scenario every time you open the page you added  the code to
 you will be able to send shell commands remotely by passing them as GET variable via URI.
 
-\paragraph{Hint} Check your PHP file type by \texttt{file filename.php}. Add \texttt{GIF8;} or \q{GIF87a} or \q{GIF89a} line as first line in your PHP file.
+\paragraph{Hint} Check your PHP file type by \texttt{file filename.php} (see \ref{subsubsec:file}). Add \texttt{GIF8;} or \q{GIF87a} or \q{GIF89a} line as first line in your PHP file.
 Check again.
 \q{7a} as well as \q{9a} describes version.
 
@@ -845,10 +857,7 @@ Check again.
 %---------------------------APPENDIX--------------------------------------------------
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{Appendix}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Other Linux tools}
 \subsection{checksums}
 Sometimes there is a need to calculate check sum of the file.
 Calculating check sum is nothing more than taking a binary file and using the algorithm calculating short string that fully depends on content of the file.
@@ -856,8 +865,59 @@ In other words if only one letter or space has been changed in file check sum wi
 There are many algorithms like MD5, SHA1 or SHA2 that we can use.
 In order to calculate checksum on Linux type in terminal:
 \texttt{md5sum <file-name>} or \texttt{sha1sum <file-name>} etc.
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{wget}
+\subsubsection{wget ftp://}
+In order to download all ftp files from ftp server you must use wget as: \newline \newline
+\q{wget -m ftp://<login><password>@<host\_ip\_address>} \newline \newline
+Where \q{-m} stands for \q{--mirror} and allows to recursively copy all the home directory from remote ftp host .Another options you can use here are:
+\begin{itemize}
+    \item \q{--no-passive} -> if your PASV transfer fails.
+\end{itemize}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{strings}
+
+The strings command returns each string of printable characters in files.
+The main usage is to determine the contents of and to extract text from binary files (i.e., non-text files).
+Example syntax could be: \newline
+\q{strings -n 8 backup.mdb >> wordlist.txt}\newline
+so it will produce the wordlist text file with printable strings with at least 8 characters.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{john}
+\label{subsubsec:john}
+The John tool allows to crack zip archives.
+It uses brute force method so you must provide wordlist for that.
+Example syntax is: \newline
+\q{john }
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{mdbtools}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{zip2john}
+zip2john utility is used to get hashed password out of zip archive.
+rar2john will work the same but for rar archives.
+Example usage is:\newline
+\q{zip2john encrypted.zip > encrypted.hash} \newline
+Afterwards to see the password you can use john the ripper - \q{john} \ref{subsubsec:john} as follows: \newline
+\q{john  --show encrypted.hash}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{file}
+\label{subsubsec:file}
+This tools shows the headers of the file and determines the format of the file.
+The output might be corrupted since it only checks file headers that could be intentionally overwritten (see \ref{subsec:phpinjection} for example).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{exiftool}
+This tool prints header information about file.
+It is similar to file but gives more datailed description like encryption method, number of bytes etc etc.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Appendix}
 
 \subsection{Linux Bonus}
 \paragraph{passwd} This text file consist of users and passwords information.
@@ -866,9 +926,6 @@ It consist of bunch of lines like: \newline
 \texttt{user-name:(x)encrypted-password?:id:group-id:system-name,,,:home-folder:default-shell} \newline
 Ids larger than 99 are created after system instalation, ids between 0-99 are reserved for "users" created during system installation.
 Passwords encryption file is called \texttt{shadow} and also located in \texttt{../etc} directory.
-
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
