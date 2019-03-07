@@ -237,11 +237,13 @@ Phyton tool quickly goes through many searching engines for possible email addre
 
 
 %TODO add more details
-\subsubsection{\texttt{Maltego}}
+\subsection{\texttt{Maltego}}
+\label{subsec:maltego}
 This data-mining tool visualises open source intelligence gathering.
 In order to run maltego type in command line \texttt{maltego}.
-You will be asked to register new account for free usage (maltego has also paid version
-which is more powerfull).
+You will be asked to register new account for free usage (maltego has also paid version which is more powerfull).
+
+
 
 \subsubsection*{\texttt{}}
 
@@ -735,12 +737,12 @@ In this scenario you can use only files from local machine that user is working 
 \paragraph{Practice with Mutillidae}
 In this Example we will include passwords file from local machine using Mutillidae.
 Go to Mutillidae and find Insecure Direct Object Reference section.
-Turn on Burb and interseption on.
+Turn on Burb and interception on.
 Choose file in selector and request uploading.
 Go to Burp and change \texttt{textfile} attribute by replacing txt file directory by (using path traversal) \texttt{../../../../../../../../../../../etc/passwd}.
 Everything should look like: \texttt{textfile=../../../../../../../../../../etc/passwd\&text-file-viewer-php-sumbit-button=View+file}.
 The most important part in here is first one where by traversaling the path we are getting text file from /etc/passwd. \texttt{textfile} in here is POST attribute.
-Obviously we could repleca original directory by any other one where even PHP code is included.
+Obviously we could replace original directory by any other one where even PHP code is included.
 
 \subsubsection{Remote File Inclusion} As name says for its own it includes files remotely.
 It can include file and upload it to server.
@@ -821,7 +823,9 @@ In order to run the script you should find possibility to embeed the following s
 In this scenario every time you open the page you added  the code to
 you will be able to send shell commands remotely by passing them as GET variable via URI.
 
-\paragraph{Hint} Check your PHP file type by \texttt{file filename.php}. Add \texttt{GIF8;} line as first line in your PHP file. Check again.
+\paragraph{Hint} Check your PHP file type by \texttt{file filename.php}. Add \texttt{GIF8;} or \q{GIF87a} or \q{GIF89a} line as first line in your PHP file.
+Check again.
+\q{7a} as well as \q{9a} describes version.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -831,7 +835,8 @@ you will be able to send shell commands remotely by passing them as GET variable
 %---------------------------SECURITY BEST PRACTISES-----------------------------------
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+\subsection{Broken access control}
+\subsection{Broken authentication}
 \section{Security Best Practises}
 
 
@@ -917,10 +922,10 @@ When you set up the connection and remote host calls some site or ip address the
 Look at the syntax example: \newline\newline
 
 
-\q{ssh -R 9004:127.0.0.1:8001 admin@mistificated.global}\newline\newline
+\q{ssh -R 9004:127.0.0.1:8080 admin@mistificated.global}\newline\newline
 
 In this case ssh establishes connection between your machine and binds to port \q{9004} on \q{mistificated.global}.
-Now if someone calls the \q{https://mistificated.global:9004} (and it does not matter whe the calling machine is from) it will see traffic that is to be send on \q{127.0.0.1:80 on your machine}.
+Now if someone calls the \q{https://mistificated.global:9004} (and it does not matter whe the calling machine is from) it will see traffic that is to be transmitted on \q{127.0.0.1:8080 on your machine}.
 So if you have an application working on \q{localhost:8080/WebGoat} (for instance WebGoat jsp app deployed locally on tomcat) and you will set up ssh port forwarding by: \newline
 \q{ssh -R 9004:localhost:8080 admin@mistificated.global} \newline
 and if user hits \q{https://mistificated.blobal:9004} in his browser, user will se the WebGoat.jsp application.
