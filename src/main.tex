@@ -40,7 +40,6 @@
 
 
 
-
 \begin{document}
 \begin{center}
 \maketitle
@@ -51,7 +50,7 @@
 \begin{abstract}
 
 This book describes methods, rules techniques etc in penetration testing.
-    This book is for beginners (but not rookies) as well as for experienced software testers who want to look deeper into testing, scripting, penetration testing, bash, python, javascript and many other things related to penetration testing.
+    This is book is for beginners (but not rookies) as well as for experienced software testers who want to look deeper into testing, scripting, penetration testing, bash, python, javascript and many other things related to penetration testing.
 \end{abstract}
 
 
@@ -836,19 +835,9 @@ In order to run the script you should find possibility to embeed the following s
 In this scenario every time you open the page you added  the code to
 you will be able to send shell commands remotely by passing them as GET variable via URI.
 
-\paragraph{Hint} Check your PHP file type by \texttt{file filename.php} (see \ref{subsec:file}).
-Add \texttt{GIF8;} or \q{GIF87a} or \q{GIF89a} line as first line in your PHP file.
+\paragraph{Hint} Check your PHP file type by \texttt{file filename.php} (see \ref{subsubsec:file}). Add \texttt{GIF8;} or \q{GIF87a} or \q{GIF89a} line as first line in your PHP file.
 Check again.
 \q{7a} as well as \q{9a} describes version.
-
-
-\subsection{Broken access control}
-\subsection{Broken authentication}
-\subsection{OAuth bypassing}
-\subsubsection{OAuth}
-OAuth is open standard for access delegation.
-It is not authorisation protocol.
-OAuth only delegates authorisation processes and provides secure access to server resources on behalf of a resource owner.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -858,7 +847,8 @@ OAuth only delegates authorisation processes and provides secure access to serve
 %---------------------------SECURITY BEST PRACTISES-----------------------------------
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+\subsection{Broken access control}
+\subsection{Broken authentication}
 \section{Security Best Practises}
 
 
@@ -893,7 +883,7 @@ Example syntax could be: \newline
 \q{strings -n 8 backup.mdb >> wordlist.txt}\newline
 so it will produce the wordlist text file with printable strings with at least 8 characters.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{john}
+\subsubsection{john}
 \label{subsubsec:john}
 The John tool allows to crack zip archives.
 It uses brute force method so you must provide wordlist for that.
@@ -902,7 +892,7 @@ Example syntax is: \newline
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{mdbtools}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{zip2john}
+\subsubsection{zip2john}
 zip2john utility is used to get hashed password out of zip archive.
 rar2john will work the same but for rar archives.
 Example usage is:\newline
@@ -910,8 +900,8 @@ Example usage is:\newline
 Afterwards to see the password you can use john the ripper - \q{john} \ref{subsubsec:john} as follows: \newline
 \q{john  --show encrypted.hash}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{file}
-\label{subsec:file}
+\subsubsection{file}
+\label{subsubsec:file}
 This tools shows the headers of the file and determines the format of the file.
 The output might be corrupted since it only checks file headers that could be intentionally overwritten (see \ref{subsec:phpinjection} for example).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -919,8 +909,7 @@ The output might be corrupted since it only checks file headers that could be in
 This tool prints header information about file.
 It is similar to file but gives more datailed description like encryption method, number of bytes etc etc.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{wpscanner}
-Automated wordpress-based sites scanner.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
