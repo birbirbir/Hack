@@ -839,6 +839,14 @@ you will be able to send shell commands remotely by passing them as GET variable
 Check again.
 \q{7a} as well as \q{9a} describes version.
 
+\paragraph{Hint} In you would like to check if some point is vulnerable to php injection you can submit the following line \q{include("<?php echo "ohdear" ?>")}
+The \q{include()} method literally includes a PHP script to your code so it is executes as it was part of php code.
+
+Another point of injecting PHP code might be via PNG file injection.
+In that case you might try set up \q{-DocumentName} parameter by using \q{exiftool} (see \ref{subsubsec:exiftool}).
+In that scenario you would inject a PHP code into the parameter like follows:  \newline
+\q{exiftool  -DocumentName="<?php phpinfo(); ?>" ../../../blablaimage.png \newline
+Check if parameter is set up: \q{exiftool ../../../blablaimage.png}. It might help you.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
