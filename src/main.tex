@@ -50,7 +50,7 @@
 \begin{abstract}
 
 This book describes methods, rules techniques etc in penetration testing.
-    This is book is for beginners (but not rookies) as well as for experienced software testers who want to look deeper into testing, scripting, penetration testing, bash, python, javascript and many other things related to penetration testing.
+    This book is for beginners (but not rookies) as well as for experienced software testers who want to look deeper into testing, scripting, penetration testing, bash, python, javascript and many other things related to penetration testing.
 \end{abstract}
 
 
@@ -835,7 +835,8 @@ In order to run the script you should find possibility to embeed the following s
 In this scenario every time you open the page you added  the code to
 you will be able to send shell commands remotely by passing them as GET variable via URI.
 
-\paragraph{Hint} Check your PHP file type by \texttt{file filename.php} (see \ref{subsubsec:file}). Add \texttt{GIF8;} or \q{GIF87a} or \q{GIF89a} line as first line in your PHP file.
+\paragraph{Hint} Check your PHP file type by \texttt{file filename.php} (see \ref{subsubsec:file}).
+Add \texttt{GIF8;} or \q{GIF87a} or \q{GIF89a} line as first line in your PHP file.
 Check again.
 \q{7a} as well as \q{9a} describes version.
 
@@ -845,7 +846,11 @@ The \q{include()} method literally includes a PHP script to your code so it is e
 Another point of injecting PHP code might be via PNG file injection.
 In that case you might try set up \q{-DocumentName} parameter by using \q{exiftool} (see \ref{subsubsec:exiftool}).
 In that scenario you would inject a PHP code into the parameter like follows:  \newline
-\q{exiftool  -DocumentName="<?php phpinfo(); ?>" ../../../blablaimage.png \newline
+\q{exiftool  -DocumentName="<?php phpinfo() __halt_compiler(); ?>" ../../../blablaimage.png} \newline
+Where \q{__halt_compiler()} halts the execution of the compiler.
+This can be useful to embed data in PHP scripts, like the installation files.
+
+
 Check if parameter is set up: \q{exiftool ../../../blablaimage.png}.
 After hitting the uploaded blablaimage.png you should see phpinfo page.
 It might help you.
@@ -915,7 +920,8 @@ Afterwards to see the password you can use john the ripper - \q{john} \ref{subsu
 This tools shows the headers of the file and determines the format of the file.
 The output might be corrupted since it only checks file headers that could be intentionally overwritten (see \ref{subsec:phpinjection} for example).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{exiftool}
+\subsubsection{exiftool}
+\label{subsubsec:exiftool}
 This tool prints header information about file.
 It is similar to file but gives more datailed description like encryption method, number of bytes etc etc.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
