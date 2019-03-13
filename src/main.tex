@@ -654,6 +654,16 @@ If application stores any kind of user input and shows this input to the user or
 For example if your application uses somehow show the data passed through CGI to the end user (e.g. embeeds CGI parameters inside html) attack can be performed by passing invalid URL: \texttt{http://application.com/search.php?title=<script>action()</script>}.
 Another technique is to pass mailicious code after \# hash in URL: \texttt{}.
 \subsubsection{Stored}  Code is stored and is ran every time page is being ran.
+In such case there are thousands of scenarios.
+If you find an input that does not validate JavaScript as plain text but as code you won.
+Below are mentioned some input data (payloads) you may inject as JavaScript code.\newline
+
+\q{Test<iframe src=javascript:alert(1) width=0 height=0 style=display:none;></iframe>} \newline
+Payloads containing spaces can also be sent however the src cannot contain any spaces or quotations so it needs to be converted into char codes, combined into a string and evaluated: \newline
+\q{<iframe src=javascript:eval(String.fromCharCode.apply(null,[108,101,116,32,116,101,115,116,32,61,32,49,50,51,59,10,97,108,101,114,116,40,116,101,115,116,41,59])) width=0 height=0 style=display:none;></iframe>} \newline
+\paragraph{Hint} \q{\&lt;} and \q{\&gt;} are used for \q{<} and \q{>} respectively in encoding convention.
+
+
 \subsubsection{DOM-based} Could be considered as refelected XSS. Injected script is located on client side (for instance: data stored after \# in URL (www.site.com/index.php\#<script></script>) is not transmitted to the server - it stays locally on client side or in DOM)-DOM-based XSS does not reach the server.
 DOM-baset XSS payload can be injected inside html events like follows: \texttt{<input type="button" name="button" onmouseover="javascript:document.action()">}.
 In example above custom function action() is executed when moving mouse coursor over the button.
@@ -663,6 +673,10 @@ In another case javascript script path can be embeeded as path to image like fol
 In this example source can be either javascript script itself or just path to script located somewhere in the internet or locally.
 It means that source could become:
 \texttt{...source="http://magicsctipts.end/magicalscript.js"}
+Or or instance: \q{<img src=javascript:alert(1)>}.
+But remember that usually you inject the code so it should like: \q{"><img src=javascript:alert(1)>}.
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{BeEF} Beef is a tool for conducting XSS attacks.
@@ -796,6 +810,10 @@ Situation from the example is very simple but in real life attacker could lead y
 Real button could really be the real one - it could transfer you to trusted site but there could be another dangerous button, hidden below with smaller z-index. \\\\
 Application APIs should be designed in the way that GET performs no changes on the server side.
 GET method should only be used for navigation or downloading content.
+\paragraph{Attack details}
+\paragraph{Defence} In order to defend from that attack we could introduce second step of verification.
+Banking applications are used to use SMS codes or captcha.
+We can also introduce unique form tokens generated on every POST, PUT or DELETE request.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -846,8 +864,8 @@ The \q{include()} method literally includes a PHP script to your code so it is e
 Another point of injecting PHP code might be via PNG file injection.
 In that case you might try set up \q{-DocumentName} parameter by using \q{exiftool} (see \ref{subsubsec:exiftool}).
 In that scenario you would inject a PHP code into the parameter like follows:  \newline
-\q{exiftool  -DocumentName="<?php phpinfo() __halt_compiler(); ?>" ../../../blablaimage.png} \newline
-Where \q{__halt_compiler()} halts the execution of the compiler.
+\q{exiftool  -DocumentName="<?php phpinfo() \_\_halt\_compiler(); ?>" ../../../blablaimage.png} \newline
+Where \q{\_\_halt\_compiler()} halts the execution of the compiler.
 This can be useful to embed data in PHP scripts, like the installation files.
 
 
