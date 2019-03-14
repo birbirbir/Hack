@@ -650,6 +650,10 @@ Now you can use all Mutillidae features.
 XSS is all about embeeding unneded code within website.
 If application stores any kind of user input and shows this input to the user or allows you to store any kind of data within html, there is always risk that XSS can be done over the website.
 
+\paragraph{Hint} Sometimes you might need double encoding in your injection attacks.
+You will use hexagonal system.
+So for example you might want to use \q{\textbackslash} but it is encoded to \q{\%5c} so instead of \q{\textbackslash} you write: \q{\%255c} since \q{\%} is encoded as \q{\%25}.
+So \q{\%255c} yields double encoded \q{\textbackslash}.
 \subsubsection{Reflected} Injected code is used only once (it can be used many times indeed but is always used in time of sending it, copying, pasting, reloading the page etc).
 For example if your application uses somehow show the data passed through CGI to the end user (e.g. embeeds CGI parameters inside html) attack can be performed by passing invalid URL: \texttt{http://application.com/search.php?title=<script>action()</script>}.
 Another technique is to pass mailicious code after \# hash in URL: \texttt{}.
@@ -658,10 +662,21 @@ In such case there are thousands of scenarios.
 If you find an input that does not validate JavaScript as plain text but as code you won.
 Below are mentioned some input data (payloads) you may inject as JavaScript code.\newline
 
-\q{Test<iframe src=javascript:alert(1) width=0 height=0 style=display:none;></iframe>} \newline
+\q{Test<iframe src=javascript:alert(1) width=0 height=0 style=display:none;></iframe>} is embeeding scripting in another tag.
+
+
 Payloads containing spaces can also be sent however the src cannot contain any spaces or quotations so it needs to be converted into char codes, combined into a string and evaluated: \newline
 \q{<iframe src=javascript:eval(String.fromCharCode.apply(null,[108,101,116,32,116,101,115,116,32,61,32,49,50,51,59,10,97,108,101,114,116,40,116,101,115,116,41,59])) width=0 height=0 style=display:none;></iframe>} \newline
-\paragraph{Hint} \q{\&lt;} and \q{\&gt;} are used for \q{<} and \q{>} respectively in encoding convention.
+
+\paragraph{Hint} \q{\&lt;} and \q{\&gt;} are used for \q{<} and \q{>} respectively in encoding convention.\newline
+
+\q{<body onload="javascript:alert()"} - using event to trigger scripting.\newline
+
+\q{<link rel="stylesheet" href="javascript:alert()"} - using dynamic href links.\newline
+
+\q{<img src="jav\&\#x0D;ascript:alert()"} - embedding carriage returns.\newline
+
+\q{');alert();//} - when devs use java script to echo data using \q{document.write}.\newline
 
 
 \subsubsection{DOM-based} Could be considered as refelected XSS. Injected script is located on client side (for instance: data stored after \# in URL (www.site.com/index.php\#<script></script>) is not transmitted to the server - it stays locally on client side or in DOM)-DOM-based XSS does not reach the server.
