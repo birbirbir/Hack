@@ -702,6 +702,9 @@ But remember that usually you inject the code so it should like: \q{"><img src=j
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Injections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%   SQL
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{SQL injection}
 Let's imagine there is an user input in the application or on the web page that allows end user to interact with database.
 SQL injection appears when
@@ -766,7 +769,9 @@ You should see that at least "username" parameter is injectible.
 Usually it it better to sent only request rather than url because it decreases mistakes and mismatches.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%   IDOR
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{IDOR - Insecure Direct Object References}
 
 \subsubsection{Local File Inclusion} It includes local files on webpage.
@@ -789,7 +794,9 @@ It can include file and upload it to server.
 This is critical vulnerability because mailicious user can remotly control server files and in the worst scenario control server shell.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%   SECURITU MISSCONFIGURATIONS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Security Misconfigurations}
 Is your software actual ? \newline
@@ -800,7 +807,9 @@ Who see your logs? How they can see them? \newline
 Does your logger or HTTP requests/responses prints out information about software and server?
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%   XSRF
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{XSRF - Cross Site Request Forgery}
 This vulnerabilities base on the idea that for instance cookies are stored locally and transferred between sites which gives good user experience because users do not need to login every time on website.
 Logging process is realized by cookie verification.
@@ -831,7 +840,9 @@ Banking applications are used to use SMS codes or captcha.
 We can also introduce unique form tokens generated on every POST, PUT or DELETE request.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%   REMOTE CODE EXECUTION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Remote Code Execution (RCE)}
 Remote code execution takes place when you are able to execute for instance shell commands on the remote machine.
 It can happen when you upload script file to the web page (javascript) which is executed or when you
@@ -854,10 +865,15 @@ Last step is to go to \texttt{http://10.10.10.10:8080/...../<war-file-name>/<jsp
 Finally you should see remote terminal and execute commands remotely.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%   BUFFER OVERFLOW
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Buffer Overflow}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%   PHP SCRIPT INJECTIONB
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{PHP script injection}
 \label{subsec:phpinjection}
 Some websites allows users to upload content other than text e.g photos, movies, games and many other odd file formats.
@@ -888,6 +904,65 @@ Check if parameter is set up: \q{exiftool ../../../blablaimage.png}.
 After hitting the uploaded blablaimage.png you should see phpinfo page.
 It might help you.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%   XXE - XML EXTERNAL ENTITY INJECTION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{XXE - External Entity Injection}
+The ENTITY statement is used to define entities in the DTD (Document Type Definition), for use in both the XML document associated with the DTD and the DTD itself.
+An ENTITY provides an abbreviated entry to place in your XML document.
+The abbreviated name is what you provide for the name parameter.
+General sysntax for entities is: \newline
+\q{<!ENTITY [\%] name [SYSTEM|PUBLIC publicID] resource [NDATA notation] >} \newline
+This XXE kind of injection is when we are dealing with input that is included in some ways into XML file.
+It might be configuration file (for instance tomcat configuration file) or other XML file.
+This situation might appear when some SOAP requests are made and input is not validated.
+Attempt to inject XML or reserved characters into input parameters and observe if XML parsing errors are generated.
+Once you found point where XML can be injected you can try playing with it (with Burp for example).
+In the simplest way you can always try is "helloworld" as \q{<message>HeyJude</message>} or \q{<user role="admin">bir</user>}.
+On the other hand you might try injecting JavaScript into XML as: \q{<element><![CDATA[<p><script>alert()</script></p>]]></element>}
+Where you should always write your JavaScript inside \q{[CDATA[<html\_or\_js\_goes\_here>]]}.
+Obviously there are many methods on injecting XML entities, let's have a look on more detailed and sophisticated payloads.\newline
+\paragraph{robots.txt}
+Most sites have included robots.txt file in main directory.
+Web site owners use the /robots.txt file to give instructions about their site to web robots - this is called The Robots Exclusion Protocol.
+This file states for instance what directories are allowed to be crawled and what are not.
+
+In an external entity attack, XML is injected or uploaded to the site in an effort to get the XML parser import the injected entity into the XML, then output the contents of the entity.
+Let's look at the payload: \newline  \q{
+<?xml version="1.0"?> \newline
+<!DOCTYPE change-log [ \newline
+<!ENTITY systemEntity SYSTEM "robots.txt"> \newline
+]> \newline
+<change-log> \newline
+<text>\&systemEntity;</text> \newline
+</change-log> \newline
+}
+In this case we begin with entity declatarion \q{!ENTITY} and give it the name \q{systemEntity}.
+The type of entity is \q{SYSTEM} which means local (operating) system.
+The path to local system file we would like to fetch is \q{/robots.txt}.
+By tag \q{<change-log></change-log>} we embed the the robots.txt by \q{\&systemEntity} - this is a substitution.
+In simple words: XML parser look up for the \q{systemEntity} SYSTEM variable, gabs the content of the file and substitutes the \q{\&systemEntity} entity declaration.
+
+
+It is external entity because robots.txt is not a part of XML file.
+On the other hand if there is no robot.txt file you might try something else including path traversaling.
+For windows you may try \q{"../../../../../../boot.ini"} or classic \q{"../../../../../../etc/passwd"} - for FUN.
+So for Linux distros try the following payload: \newline
+
+\q{<?xml version="1.0" standalone="no" ?> \newline
+<!DOCTYPE demo [<!ELEMENT demo (\#PCDATA)> \newline
+<!ENTITY xxe SYSTEM "file:///etc/passwd" >]> \newline
+<a>\newline
+<inject>\&xxe;</inject>\newline
+</a>\newline}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%   Oauth capturing
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
