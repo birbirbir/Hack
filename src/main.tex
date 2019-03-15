@@ -714,15 +714,23 @@ If mentioned input is login and password the simple example SQL syntax could loo
 \texttt{SELECT * FROM users WHERE login='<user input login>' and password='<user input password>'}
 \newline
 If input is not properly secured simple SQL injection could take place while providing the phrase between quotes "":\texttt{"' OR 1=1 -- "}.
-Whis phrase within the entire query qill look like:
+This phrase within the entire query will look like:
 \newline
 \texttt{SELECT * FROM users WHERE login='' OR 1=1 -- ' and password='<user input password>'}
 So it does not matter what password we provided since is was commented out by "-- " which comments out queries in SQL syntax.
 Remember that after "-- " one space is present.
 In mentioned query "1=1" statement always recives TRUE so the whole query is executed.
-Obciously before commenting out the password input we could finish this query and start another one with different function (in this query we deal with SELECT FROM function).
+Obviously before commenting out the password input we could finish this query and start another one with different function (in this query we deal with SELECT FROM function).
 
-There are few methods protecting againts SQL injection.
+Below are mentioned anothed SQL payloads for injection you might use.
+\paragraph{via GET} \q{../user-account.php?username=jeremy'+union+select+<column\_name>+from+accounts+--+}
+\paragraph{get schema metadata info (MySql)} \q{../user-account.php?username=jeremy'+union+select+table\_name+from+information\_schema.tables+--+}
+If you somehow meet the error that number of columns is not equal it means that number of columns in original query and number of columns in injected query are different.
+To sort it out add as much columns in injected query as you need.
+In the following example we had to add 3 columns (null,null,null).
+\paragraph{get schema metadata info (MySql)} \q{../user-account.php?username=jeremy'+union+select+table\_name,null,null,null+from+information\_schema.tables+--+}
+
+There are few methods protecting against SQL injection.
 First of all we should sanitize the input.
 Sanitization is the process of removing all SQL, JS, PHP etc syntax special characters from user input.
 Example below shows the example PHP validation and sanitisation functions:
@@ -793,18 +801,7 @@ Obviously we could replace original directory by any other one where even PHP co
 It can include file and upload it to server.
 This is critical vulnerability because mailicious user can remotly control server files and in the worst scenario control server shell.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%   SECURITU MISSCONFIGURATIONS
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Security Misconfigurations}
-Is your software actual ? \newline
-Do you use features ? What features do you use ? \newline
-Default passwords ? Do you hash them ? \newline
-How do you perform your error handling ? \newline
-Who see your logs? How they can see them? \newline
-Does your logger or HTTP requests/responses prints out information about software and server?
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -957,21 +954,73 @@ So for Linux distros try the following payload: \newline
 <inject>\&xxe;</inject>\newline
 </a>\newline}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%   JSON injection
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\subsection{JSON injection}
+If page uses JSON to pass data which is later parsed and incorporated into the page and output is not properly encoded, it is possible to carefully craft an injection which will add extra data into the JSON without breaking the JSON syntax.
+This extra data will be executed by the browser once the data is incorporated into the page.
+Remember that there is no recipe how to inject the data.
+Since you are injecting data to JSON file injection depends on file structure, number and type of nodes etc.
+\paragraph{Example}
+Let's consider mutillidae JSON injection (pen-test-tool-lookup-ajax.php).
+In this example we choose some variables and asynchronous call is made by JavaScript in the background.
+Page is being updated with data with chosen variable (in that case some pentesting tools).
+Intercepted response body look like: \newline
+\{\newline
+"query": \{\newline
+"toolIDRequested": "1",\newline
+"penTestTools": [\{\newline
+"tool\_id": "1",\newline
+"tool\_name": "WebSecurify",\newline
+"phase\_to\_use": "Discovery",\newline
+"tool\_type": "Scanner",\newline
+"comment": "Can capture screenshots automatically"\newline
+\}]\}\}
 
+In that case we want to inject JavaScript code into that body and it will be executed on website.
+When intercepting the request we find \q{ToolID} post variable, so we guess that will be the point of injecting the javascript code.
+The hint here is that you should always use some kind of javascript text editor with formatter so when you type you hypothesis about injection it is clearly visible how the response body will be looking like.
+We also see that requested \q{ToolID} is the same parameter as \q{toolIDRequested} in the response body, so the guess is: we put injected code here and it will appear in the response body and will be incorporated into the source code,
+The solution here is that we must put \q{1"\}\});alert();//} here in order to properly inejct the JS code.
+I guess all symbols orgins here are understandable except ")".
+The tricky part here is that parenthesis here must appear because the whole response body afterwards will be sent directly to some \q{function()} inside \q{<script><\/script>} and since we are uncommenting last part after the semicolon we must ensure that function is properly closed.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%   Oauth capturing
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{OAuth capturing}
 
+\subsection{Buffer Overflow}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%   SECURITU MISSCONFIGURATIONS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{General questions about security misconfigurations}
+Is your software actual ? \newline
+Do you use features ? What features do you use ? \newline
+Default passwords ? Do you hash them ? \newline
+How do you perform your error handling ? \newline
+Who see your logs? How they can see them? \newline
+Does your logger or HTTP requests/responses prints out information about software and server?
+
+\subsection{Platform path disclosure}
+\subsection{SSL misconfiguration}
+\subsection{Information disclosure}
+\subsection{Broken access control}
+\subsection{Broken authentication}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %---------------------------SECURITY BEST PRACTISES-----------------------------------
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Broken access control}
-\subsection{Broken authentication}
+
 \section{Security Best Practises}
 
 
@@ -1139,7 +1188,6 @@ and if user hits \q{https://mistificated.blobal:9004} in his browser, user will 
 \subsubsection{Curl}
 \label{subsubsec:curl}
 
-\subsection{Buffer Overflow}
 
 
 
@@ -1214,8 +1262,12 @@ It provides the hardware means of sending and receiving data on a carrier, inclu
 Fast Ethernet, RS232, and ATM are protocols with physical layer components.
 \subparagraph{examples} Ethernet, FDDI, B8ZS, V.35, V.24, RJ45.
 
-
-
+\subsection{Cross-Orgin Resource Sharing}
+Cross-Origin Resource Sharing (CORS) is a mechanism that uses additional HTTP headers to tell a browser to let a web application running at one origin (domain) have permission to access selected resources from a server at a different origin.
+A web application executes a cross-origin HTTP request when it requests a resource that has a different origin (domain, protocol, and port) than its own origin.
+For security reasons, browsers restrict cross-origin HTTP requests initiated from within scripts.
+For example, XMLHttpRequest and the Fetch API follow the same-origin policy.
+This means that a web application using those APIs can only request HTTP resources from the same origin the application was loaded from, unless the response from the other origin includes the right CORS headers.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Linux Priviledge Escalation}
 
