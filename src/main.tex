@@ -297,6 +297,7 @@ Dirb scanner uses predefined wordlist in order to check all child directories fo
 It is actually powerful metasploit module and it is called: \texttt{auxilary/crawler/msfcrawler} and its being used in the same way as other metasploit modules.
 
 \subsubsection{websploit}
+\label{subsubsec:websploit}
 
 This is a substitute for metasploit for web applications and its usage is very similar.
 One websploit module works similarly to wmap and it is called: \texttt{web/dir search}.
@@ -308,14 +309,25 @@ Spider is a module of burp suite that scans the application.
 See more in \ref{subsec:burp}
 
 \subsubsection{gobuster}
+\label{subsubsec:gobuster}
 Gobuster is a tool used to brute-force on URLs (directories and files) in websites and DNS subdomains.
 Gobuster can be downloaded through the apt- repository.
 Example syntax is: \newline
 \q{gobuster -u http://192.168.1.108/pages -w /usr/share/wordlists/dirb/common.txt}
 
 
+\subsubsection{amass}
+\label{subsubsec:amass}
+Amass is probably the most powerfull scraper written in C.
+Amass looks for subdomains for particular webdomain.
+Let's download it via docker \ref{subsubsec:docker}.
+Type in the commandline: \newline
+\q{sudo docker build -t amass https://github.com/OWASP/Amass.git} \newline
+Now you can run the image against the given domain by: \newline
+\q{sudo docker run amass --passive -d zbirek.wow}
 
-
+The Amass also needs a wordlist to work with but in this time the wordlist is included in the \q{/wordlist/} within the container.
+You can run: \q{sudo docker run amass -w /wordlists/all.txt -d example.com}
 
 
 
@@ -1279,6 +1291,33 @@ Search - Know what to search for and where to find the exploit code. \newline
 Adapt - Customize the exploit, so it fits
 Not every exploit work for every system "out of the box". \newline
 Try - Get ready for (lots of) trial and error. \newline
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Docker}
+\label{subsubsec:docker}
+Docker is a tool designed to make it easier to create, deploy, and run applications by using containers.
+Containers allow a developer to package up an application with all of the parts it needs, such as libraries and other dependencies, and ship it all out as one package.
+By doing so, thanks to the container, the developer can rest assured that the application will run on any other Linux machine regardless of any customized settings that machine might have that could differ from the machine used for writing and testing the code.
+
+In a way, Docker is a bit like a virtual machine.
+But unlike a virtual machine, rather than creating a whole virtual operating system, Docker allows applications to use the same Linux kernel as the system that they're running on and only requires applications be shipped with things not already running on the host computer.
+This gives a significant performance boost and reduces the size of the application.
+
+In order to install docker go to \hyperref{https://docs.docker.com/install/linux/docker-ce/ubuntu/} and follow the instructions.
+Once you have docker installed you run it by \q{service docker start}.
+
+\paragraph{Example} Install ubuntu image.
+Run the command \q{docker run ubuntu}.
+Now the docker checks if the ubuntu image is on your local machine (you can check it by \q{docker ps -a}).
+If is not present docker pulls it from docker repository (hub) and deploys it on your machine.
+If you run \q{docker run -it ubuntu} it will start new container and you will be able to interact with shell.
+To remove container just type \q{docker container rm <container\_id> }
+
+
+For example docker allows you to install an image of any "docked" application.
+For instance
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %----------------------------BIBLIOGRAPHY--------------------------------------------
