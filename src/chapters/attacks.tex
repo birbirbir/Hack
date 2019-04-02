@@ -1,0 +1,29 @@
+
+\section{Attacks}
+
+In this section few types of attacks and related to them tools are described.
+
+\subsection{Brute force attack}
+\label{subsec:bruteforce}
+This attack relates to forcing the target.
+In this scenario you want to send thousands of requests on one endpoint or set of endpoints.
+In such case you think that after such stack of tries you will find the solution.
+There are many ways and tools to help you in this attack and they are mentioned below.
+
+\subsubsection{Hydra}
+\label{subsubsec:hydra}
+Hydra is a parallelized login cracker which supports numerous protocols to attack.
+It is very fast and flexible, and new modules are easy to add.
+This tool makes it possible for researchers and security consultants to show how easy it would be to gain unauthorized access to a system remotely.
+
+The basic syntax is: \texttt{hydra -L <path\_to\_login\_wordlist> -P <path\_to\_pass\_wordlist> <target\_ip> }
+
+You can also use it for endpoints that does not need pass and login, it can be used for any kind of input.
+
+\subsubsection{Curl}
+Curl is mentioned here but it is not attack-focused tool.
+It is mentioned here since it allows you send multiple requests in looped way by scripting in bash.
+In order to sent POST request on \texttt{/registration} endpoint you should send the following request multiple times:\newline \newline
+\texttt{curl -d "param1=value1\&param2=value2" -X POST http://<remote\_or\_local\_host>:3000/data} \newline
+where param1 and param 2 can be login and password.
+For more detailed info about scripting in curl see\ref{subsubsec:curl}.

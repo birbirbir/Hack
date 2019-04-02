@@ -1,0 +1,83 @@
+
+\section{Metasploit}
+Metasploit is a framework for penetration testing, which has included the whole base of vulnerabilities for different systems and API that allows testers to exploit or scan targets.
+By vulnerabilities here are meant points of the target which are not secured properly and are vulnerable for attack e.g:
+login or password buffer overflow on target's database server.
+Metasploit uses predefined exploits and payloads in order to get control over the target system.
+Exploit is technically program (procedure) that uses shellcode scripts in order to exploit vulnerabilities Each exploit and payload must be configured for particular target.
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{msfconsole}
+In order to use metasploit framework you can go directly to Applications->Exploitation tools and go to Metasploit.
+This approach will run the terminal simultaneously running all
+data bases and services in the background.
+If you wish you can run Metasploit directly from terminal by typing \texttt{msfconsole} but you might need to run postgresql service (\texttt{service postgresql start}).
+
+\subsubsection{Searching for exploits, run exploit}
+
+Now you need to see the info, options and payloads for the exploit by typing: \texttt{info, options, show payloads} respectively.
+If you know what exploit you will be using you can directly type into msf console the following line:
+\texttt{use <exploit/name>}.
+If you do not know the exploit you can check it online on www.rapid7.com
+or by typing in msf console \texttt{search <exploit/tag/orname>} and then you can \texttt{use} it.
+Afterwards you are moved to exploit subconsole.
+Now you need to set the payload: \texttt{set payload <payload/name>},
+then if you type \texttt{options} again, you will see all mandatory options (for listener and reciever).
+Now is time for setting up the options e.g: \texttt{set RHOST 192.168.4.56} or \texttt{set LHOST 192.168.4.56}
+if you are using reverse shell (pushing the connection back to the listener (attack machine) rather than
+waiting for an incoming connection from target which is more likely to make connection through firewall \cite{pen}).
+
+\subsubsection{Outputing data}
+If you want to output data somewhere (which is VERY usefull) you can use spooling before you start exploiting.
+Just type in msf console (before running exploit) \texttt{spool <file-name.txt/log/etc>}.
+In order to turn off spooling use \texttt{spool off}.
+Spool saves the whole terminal output stream.
+\paragraph{Example}
+In this example you will get control over the Windows XP SP3 system which you installed as VM. In msfconsole run the following: \newline\newline
+\texttt{use/windows/pop3/seattlelab\_pass} \newline
+\texttt{set RHOST XXX.XXX.XXX.XXX} (your target IP) \newline and run the exploit by typing: \newline \texttt{exploit} \newline \newline
+
+Now you are in meterpreter sub console.
+Check the following commands: \texttt{help, background, pwd, shell}, for more commands go to: https://www.offensive-security.com/metasploit-unleashed/meterpreter-basics/ .
+So what has happend ?
+You exploited unauthenticated buffer overflow vulnerability in the POP3 server of Seattle Lab Mail 5.5 by sending a password with excessive length (for more info check exploit info in msfconsole, for more info about buffer overflow go to Buffer Overflow section in this article).
+
+\subsubsection{msfcli}
+MetaSploit Framework Command Line Interpreter is another way to interact with Metasploit.
+Is especially useful while scripting Metasploit commands or while testing new payloads in automated way.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Metasploit Scanner Modules and Check functions}
+
+Metasploit serves vulnerability searching modules, these modules begin from \texttt{scanner/}.
+In order to use metasploit scanner treat scanner as regular module and run is with \texttt{use <module\_name>}, set up options and run exploit.
+Example module can be \texttt{scanner/ftp/anonymous} which searches for anonymous access via FTP ports, which can be dangerous when some important data
+are stored on client side and are allowed to use FTP port.
+
+Some exploits have embeeded \texttt{check} functions.
+They can be used instead of \texttt{exploit} function in order to literally check if target is vulnerable to given exploit.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Armitage}
+
+Armitage is GUI for metasploit enriched by many automated tools helping a tester figure out what exploit should be used (what is the target vulnerability).
+In order to run Armitage go to Applications-> Exploitation Tools.
+Login to database with default credentials.
+Armitage is good option if you have no ideal what exploit you should use.
+There two options to get that knowledge.
+First is to check all possible attacks and choose preferred one, second is run Heil Mary and perform all possible attacks one after another.
+The difference is that first method
+only checks for available exploits for the target whereas the second one runs all exploits without asking.
+The problem is that the second one can really crash the system, so it is not recommended but still worth to work around.
+First of all go to: Hosts->Nmap->Intense\_scan or Hosts->MSFscan
+, you will then get your local network scanned so you will know what systems are there and what exploit you will be able to use.
+In order to perform first option go to: Hosts->Find\_attacks.
+After this you will need click on selected machine and choose check all possible attacks separately, then choose proper exploit and use it.
+If you want to use second option go to Hosts>Heil Mary, after this all possible exploits will be ran on the target system.
+If your system is vulnerable and can be affected, the system "screen" icon will changed and you will be informed about action taken over the system.
+Then you can run meterpreter from target options and use the same commands like in terminal meterpreter.

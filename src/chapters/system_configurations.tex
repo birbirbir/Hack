@@ -1,0 +1,78 @@
+
+\section{Software, Hardware, Network and Targets configuration}
+\label{sec:sys_config}
+The following chapter will cover the most important stuff needed to build penetration testing laboratory.
+By laboratory I mean building the local network with static addresses enforced with operating systems, applications and proper hardware in order to keep
+investigations at one point and make sure we are not influencing innocent victims PC or laptop machines.
+During this chapter you will be asked to preinstall few virtual machines as well as configure their network parameters.
+You will also install some target software, as well as other perhaps less important but recommended applications.
+We will be using KALI Linux distribution for our penetration testing purposes.
+Treat KALI as an investigator.
+KALI Linux is Debian-based linux distribution which is the successor of BackTrack linux distribution.
+KALI has pre-installed  dozens of penetration testing tools including information gathering, fingerprinting,target exploiting and so forth.
+\subsection{Hardware}
+It is recommended to use 40-50 GB of space for each operating system as well as at least 2 GB RAM for each.
+This is because sometimes you will need to
+run some test on few platforms simultaneously and each platform consumes its own RAM memory.
+Remember that you cannot leave your host machine with no RAM memory.
+\subsection{Virtual machines}
+First of all we will start from installing all needed systems and applications.
+Install mentioned systems within VirtualBox.
+Do the following steps:
+\begin{enumerate}
+    \item{Install VirtualBox}
+    \item{Install on VirtualBox:}
+    \begin{itemize}
+        \item{Kali 3.0.X}
+        \item{Windows XP English SP3}
+        \item{Windows 7 Professional SP1}
+        \item{Ubuntu 8.10}
+    \end{itemize}
+    \item{Configure all machines networks to Bridged and select your main interface. Set all machines IPs to static. Remember IP for each machine in the network.
+    On your host machine Desktop create folder to share. On each of machine create "Insert guest device" and configure it for folder you shared. This will allow you to transfer files with high speed from your host
+    to your VMs. You might have problems with internet configuration on Windows, check if you have installed Intel drivers for network card, if not transfer them via shared folder and install on proper machines. If your Kali network does not work check your interface and check
+    \texttt{/etc/network/interfaces}. You might also need to change \texttt{[ifupdown] managed} variable and set it to \texttt{true} in \texttt{/etc/NetworkManager/NetworkManager.conf}}
+
+    \item{On Kali you need to add apt-get sources to \texttt{/etc/apt/sources.list} file. Add the following:
+
+    \begin{itemize}
+        \item{\texttt{deb http://http.kali.org/kali kali-rolling main contrib non-free}}
+        \item{\texttt{deb http://old.kali.org/kali sana main non-free contrib}}
+        \item{\texttt{deb http://old.kali.org/kali moto main non-free contrib}}
+    \end{itemize}
+
+    Afterwards update and upgrade apt-get and after this instal linux kernel headers by running:
+    \texttt{apt-get install -y dkms linux headers \$(uname -r)},  \newline
+    if this does not work include in mentioned command kernel version manually.
+    }
+    \item{On linux based machines you will probably need to restart networking by running: \texttt{service networking restart; service network-manager restart}}
+    \item{Install on Windows XP:}
+    \begin{itemize}
+        \item{Zervit 0.4}
+        \item{SLMail 5.5}
+        \item{3Com TFTP 2.0.1}
+        \item{XAMPP 1.7.2}
+        \item{War-FTP}
+        \item{WinSCP}
+        \item{Immunity Debugger (ID); copy Mona.py to C:/Program Files/Immunity inc/Immunity Debugger/PyCommands; at the bottom of ID
+        in command line type: \texttt{!mona config -set working folder c:/logs/\%p}, this will set logs output.}
+
+    \end{itemize}
+    \item{Make XP act like it is a mamber of a Windows Domain; many external targets are members of Windows Domain so we need this configuration
+    also on our XP system; In order to set it up go to: \texttt{Start> Run> secpolmsc; Local Policies> Security Options> Network Access> Sharing and security model for local accounts:
+    Classic - local users authenticate as themselves}}
+
+    \item{Install on Kali:}
+
+
+    \begin{itemize}
+        \item{Android SDK; go to >packages and install Android SDK Tools and Platform Tools; afterwards you will install some Android emulator machines.}
+        \item{Smartphone Pentest Framework; remember to configure for your host machine in text editor \texttt{kaliinstall} installation script.}
+        \item{Nessus; go to Nessus web page, register new user and get registration keys; Nessus is opened by
+        \texttt{/etc/init.d/nessusd start} command; open http://kali:8834 , provide password and username and download plugins.}
+        \item{Hyperion; you will need to compile hyperion C code using g++.}
+        \item{Veil-Evasion}
+    \end{itemize}
+    \item{Configure Ettercap; edit \texttt{/etc/ettercap/etter.conf} by uncommenting "iptables" redir commands. This sets up a firewall.}
+    \item{Having configured all VMs ping them from host and vice versa.}
+\end{enumerate}

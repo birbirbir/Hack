@@ -1,0 +1,170 @@
+
+\section{Investigations and information gathering}
+The most important thing in software testing are is to gather all possible and needed information about targets.
+The more information you are able to analyze, the better and the more valuable test you are able to perform.
+Obviously you can proceed with exploration testing with no knowledge about target but it only means you will gather this knowledge
+during the investigation what is the point of exploration testing.
+Remember that during information gathering phase the most important thing is to keep all info sorted in one place.
+You can install program called CherryTree for information storage purposes.
+
+
+% -------------------------- NETWORK SCANNING --------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mapping network tools}
+%\texttt{} : \texttt{ }
+
+\subsubsection{\texttt{whois <options> domain name}}
+This tools checks domain registration details like owner, technical contact, OS etc.
+
+\subsubsection{\texttt{nmap <options> ip/ip range <options> <>}}
+This if powerfull tool allowing to scan ports or other system information on one or more then one IPs.
+\newline
+\newline
+
+\texttt{<XXX.XXX.XXX.XXX-XXX>} - Example IP range.
+\newline
+
+\texttt{-A} - Shows system parameters.
+\newline
+
+\texttt{-oA} - Output in three major formats at once (.nmap, .gnmap (grepable), XML) e.g.: \texttt{-oA <filename>}
+\newline
+
+\texttt{-p} - Port range e.g: \texttt{-p 0-500}
+\newline
+
+\texttt{-sS} - SYN scan, "half-open scan", is part of TCP scan but without ACK (TCP handshake consist of SYN/SYN-ACK/ACK).
+SYN checks if ports are available but does not start the connection.: \texttt{-p 0-500}.
+\newline
+
+\texttt{-sV} - Version scan, gives more detailed information about target.
+\newline
+
+\texttt{-sU} - UDP scan (User Datagram Protocol is a part of core members of Internet Protocol Suite).
+Nmap here sends a UDP packet to a port.
+If port is not open nmap recives "port unreachable" message.
+Usually this scan shows different ports than other scans and it takes more time to proceed.
+\newline
+
+
+
+\subsubsection{\texttt{NetCat: nc <options> hostname port(s)}}
+Netcat, usually abbreviated to nc, is a network utility with which you can use TCP/IP protocols to read and write data across network connections.
+You can use it to create any kind of connection as well as to explore and debug networks using tunneling mode, port-scanning, etc.
+Checks whether given ports are listening.
+
+\texttt{-v} - Verbose, use twice (-vv) to get more info, e.g: \texttt{nc -v 127.0.0.1  8080}
+
+\subsubsection{\texttt{nslookup}}
+DNS translator. Example : \texttt{nslookup www.google.com}
+
+%TODO add more details
+\subsubsection{\texttt{host}}
+Ask for a servers for particular domain.
+
+\subsubsection{\texttt{theHarvester}}
+Phyton tool quickly goes through many searching engines for possible email addresses.
+\newline
+
+\texttt{-d} - Domain name
+\newline
+
+\texttt{-l} - Limit outcomes
+\newline
+
+\texttt{-b} - Specify search engines e.g.: \texttt{ theharvester -d cogniance.com -l 100 -b all }
+
+
+%TODO add more details
+\subsection{\texttt{Maltego}}
+\label{subsec:maltego}
+This data-mining tool visualises open source intelligence gathering.
+In order to run maltego type in command line \texttt{maltego}.
+You will be asked to register new account for free usage (maltego has also paid version which is more powerfull).
+
+
+
+\subsubsection*{\texttt{}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hunting for vulnerabilities, NESSUS}
+
+Nessus has already been installed on Kali VM. In order to run Nessus you must run daemon by typing: \texttt{service nessusd start} in the terminal.
+Nessus by default is running on \texttt{https://kali:8834 port}.
+If you want to enter Nessus from outside of Kali you must type \texttt{https://<kali\_ip\_address>:8834}.
+
+\subsubsection{Policies}
+
+Policies are the set of rules explaining what to do during scan or how to behave when vulnerability has been found.
+In order to create new policy go to Policies/New Policy.
+
+\subsubsection{Scan}
+
+In order to prepare new scan go to My Scans/New Scan.
+Set up all needed information and set target(s) IP(s).
+After scanning all data about vulnerabilities can be found in my Scans section.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Web application scanning. Web crawlers}
+\label{subsec:webscanning}
+
+In general web application scanners work from two points of view.
+First is when we know all the endpoints of the web application and we put that endpoints as input for scanner.
+Then scanner "somehow" is looking for application vulnerabilities like hidden fields, comments hardcoded values etc.
+Second method is when we do not know endpoints of the application so we need to discover them.
+The process of endpoints discovery is called "crawling".
+Web crawlers are forced with word lists and use them as assumption of endpoint names by sending thousands of (usually HTTP GET) requests on prepared endpoints.
+For example if word list consist of one word "hackme" and host name is 10.10.10.10 crawler will be looking for \texttt{10.10.10.10/hackme} endpoint.
+The same if word list consist of many words (millions or billions) discovered endpoint list grows as tree and iv time consuming.
+The positive value is that crawlers give you a lot of information about website structure and give you many ideas which endpoints could be vulnerable.
+\subsubsection{nikto}
+Nikto is web application vulnerability scanner.
+Nikto output verboses information and potential vulnerabilities in terminal.
+This information are readable suggestions.
+\newline
+\texttt{nikto -h google.pl}
+
+\subsubsection{dirb}
+
+Dirb scanner uses predefined wordlist in order to check all child directories for provided parent one node eg:
+\newline
+\texttt*{dirb 'http://10.10.10.76/admin/api'}
+
+\subsubsection{crawler (wmap)}
+It is actually powerful metasploit module and it is called: \texttt{auxilary/crawler/msfcrawler} and its being used in the same way as other metasploit modules.
+
+\subsubsection{websploit}
+\label{subsubsec:websploit}
+
+This is a substitute for metasploit for web applications and its usage is very similar.
+One websploit module works similarly to wmap and it is called: \texttt{web/dir search}.
+Usage is as regular websploit module.
+
+
+\subsubsection{spider}
+Spider is a module of burp suite that scans the application.
+See more in \ref{subsec:burp}
+
+\subsubsection{gobuster}
+\label{subsubsec:gobuster}
+Gobuster is a tool used to brute-force on URLs (directories and files) in websites and DNS subdomains.
+Gobuster can be downloaded through the apt- repository.
+Example syntax is: \newline
+\q{gobuster -u http://192.168.1.108/pages -w /usr/share/wordlists/dirb/common.txt}
+
+
+\subsubsection{amass}
+\label{subsubsec:amass}
+Amass is probably the most powerfull scraper written in C.
+Amass looks for subdomains for particular webdomain.
+Let's download it via docker.
+Type in the commandline: \newline
+\q{sudo docker build -t amass https://github.com/OWASP/Amass.git} \newline
+Now you can run the image against the given domain by: \newline
+\q{sudo docker run amass --passive -d zbirek.wow}
+
+The Amass also needs a wordlist to work with but in this time the wordlist is included in the \q{/wordlist/} within the container.
+You can run: \q{sudo docker run amass -w /wordlists/all.txt -d example.com}
+
