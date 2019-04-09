@@ -48,7 +48,18 @@ It means that source could become:
 Or or instance: \q{<img src=javascript:alert(1)>}.
 But remember that usually you inject the code so it should like: \q{"><img src=javascript:alert(1)>}.
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  Java script included into pictures
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+This situation appears when site evaluates pictures into code, site does not strip EXIT data (does not remove EXIF headers of picture) and is obviously vulnerable to XSS injection.
+For purpose of this chapter some 3rd party tools are needed.
+You can download them from github: \q{https://www.github.com/jlkmnn/imagejs}.
+Please clone the repository use \q{cmake} and \q{make} to build the output program.
+Prepare \q{<file>.js} with payload that will be embeeded into GIF file.
+In order to embeed JS code into the GIF image follow the steps from README (one files compiled type in the terminal \q{./imagejs gif <file>.js}).
+At the end you must embeed the picture to the page.
+You can do it via DOM property of img: \q{<img src="giphy.gif">} and \q{<script src="profile.js.gif"></script>}.
+Refresh the page.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{BeEF} Beef is a tool for conducting XSS attacks.
