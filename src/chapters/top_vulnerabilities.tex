@@ -125,6 +125,18 @@ This is important to ensure get parameters in url in this case.
 If you are dealing with different scenario (e.g. POST method) you can intercept the request in Burb and copy it to \texttt{example.request} file (you create this file somwhere in the system).
 Then you can use this request file and pass it in sqlmap by \texttt{-r} flag: \newline
 \texttt{sqlmap -r "../../example.request"}
+\paragraph{Cookie injection}
+If you want to inject SQL in cookie vlaue you must use the syntax:
+\q{sqlmap -u "http://test.com" --cookie="JSESSION=" -p "JSESSION" --level 3}
+Where \q{--level} parameter describes the level of testing.
+For different levels against SQL injection the following params are tested:
+
+Level >=2: HTTP Cookie
+\newline
+Level >=3: HTTP Cookie header, HTTP Referer
+\newline
+Level >=5: HTTP Host header
+\newline
 \paragraph{Practise with Mutillidae}
 In this example you can practise sqlmap in Mutillidae.
 Go to userinfo page.
@@ -132,6 +144,18 @@ Choose  any kind of user, send request and intercept it in Burb.
 Save request as file.request and pass it in sqlmap.
 You should see that at least "username" parameter is injectible.
 Usually it it better to sent only request rather than url because it decreases mistakes and mismatches.
+\paragraph{UNION attack}
+When an application is vulnerable to SQL injection and the results of the query are returned within the application's responses, the UNION keyword can be used to retrieve data from other tables within the database.
+This results in an SQL injection UNION attack.
+The UNION keyword lets you execute one or more additional SELECT queries and append the results to the original query.
+For example: \q{SELECT a, b FROM table1 UNION SELECT c, d FROM table2}
+This SQL query will return a single result set with two columns, containing values from columns a and b in table1 and columns c and d in table2.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%  Blind SQL
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Blind SQL injection}
+Blind SQL injection arises when an application is vulnerable to SQL injection, but its HTTP responses do not contain the results of the relevant SQL query or the details of any database errors.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -223,6 +247,7 @@ Finally you should see remote terminal and execute commands remotely.
 %%%%%%%   BUFFER OVERFLOW
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Buffer Overflow}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
