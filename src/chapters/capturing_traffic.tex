@@ -16,6 +16,32 @@ It allows you ot manipulate requests and their parameters.
 When you set up proxy settings turn Burb suite and your browser.
 From now all requests you send through browser are catched in burb and you can change their parameters and forward them farther.
 
+
+\newline
+\q{Toggle Proxy interception - Ctrl+T}
+\newline
+\q{Switch to Proxy - Ctrl+Shift+P}
+\newline
+\q{Switch to Intruder - Ctrl+Shift+I}
+\newline
+\q{Switch to Repeater - Ctrl+Shift+R}
+\newline
+\q{Go to previous tab - Ctrl+Minus}
+\newline
+\q{Go to next tab   Ctrl+Equals}
+\newline
+\q{Send to Repeater Ctrl+R}
+\newline
+\q{Send to Intruder Ctrl+I}
+\newline
+\q{Forward intercepted Proxy message Ctrl+F}
+\newline
+\q{URL-encode key characters Ctrl+U}
+\newline
+\q{HTML-encode key characters Ctrl+H}
+\newline
+\q{Base64-encode Ctrl+B}
+
 \subsubsection{Target module}
 Target module consist of Site map and Scope.
 Site map lists all the pages and sublists all the subpages that you visited (or your client has redirected to in some way).
@@ -126,8 +152,15 @@ During the measurement you can copy tokens to the text file so it will help you 
 %todo add analyse + graph pictures
 \subsubsection{Other modules}
 
+\subsubsection{Burp collaborator}
+\label{subsubsec:burp_collab}
+Burp Collaborator is a network service that Burp Suite uses to help discover many kinds of vulnerabilities.
+For example: Some injection-based vulnerabilities can be detected using payloads that trigger an interaction with an external system when successful injection occurs.
+For example, some blind SQL injection vulnerabilities cannot be made to cause any difference in the content or timing of the application's responses, but they can be detected using payloads that cause an external interaction when injected into a SQL query.
+\p{scale=0.3}{../figures/download.png}{Burp collaborator working schema}{Burp collaborator working schema}{burp_collaborator_schema}
 
-\paragraph{Hint} \texttt{ctrl+U} encodes the text.
+
+
 
 \subsection{Wireshark}
 \label{subsec:wireshark}
